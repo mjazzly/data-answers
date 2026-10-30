@@ -1,0 +1,31 @@
+order_id,branch,order_date,month,quarter,category,channel,order_value,returned
+ORD-04949,Westgate,2025-12-01,2025-12,2025-Q4,Kitchen,Online,598.00,false
+ORD-04950,Central,2025-12-01,2025-12,2025-Q4,Cooling,Online,399.00,false
+ORD-04951,Central,2025-12-01,2025-12,2025-Q4,Cooling,"In store",399.00,false
+ORD-04952,Central,2025-12-02,2025-12,2025-Q4,Kitchen,"In store",130.00,false
+ORD-04953,Central,2025-12-03,2025-12,2025-Q4,Kitchen,"In store",159.00,false
+ORD-04954,Westgate,2025-12-05,2025-12,2025-Q4,Cooling,"In store",149.00,false
+ORD-04955,Westgate,2025-12-06,2025-12,2025-Q4,"Personal Care",Online,278.00,false
+ORD-04956,Westgate,2025-12-06,2025-12,2025-Q4,Kitchen,"In store",89.90,false
+ORD-04957,Central,2025-12-06,2025-12,2025-Q4,"Personal Care","In store",198.00,false
+ORD-04958,Westgate,2025-12-07,2025-12,2025-Q4,"Personal Care","In store",99.00,false
+ORD-04959,Central,2025-12-09,2025-12,2025-Q4,Cooling,"In store",798.00,false
+ORD-04960,Westgate,2025-12-12,2025-12,2025-Q4,Kitchen,Phone,159.00,false
+ORD-04961,Central,2025-12-13,2025-12,2025-Q4,Cooling,"In store",149.00,false
+ORD-04962,Westgate,2025-12-14,2025-12,2025-Q4,Kitchen,"In store",299.00,false
+ORD-04963,Central,2025-12-14,2025-12,2025-Q4,Kitchen,"In store",129.00,false
+ORD-04964,Westgate,2025-12-16,2025-12,2025-Q4,Kitchen,"In store",269.70,false
+ORD-04965,Westgate,2025-12-17,2025-12,2025-Q4,"Garment Care","In store",75.00,false
+ORD-04966,Westgate,2025-12-17,2025-12,2025-Q4,Kitchen,"In store",65.00,false
+ORD-04967,Westgate,2025-12-18,2025-12,2025-Q4,"Personal Care","In store",99.00,true
+ORD-04968,Westgate,2025-12-18,2025-12,2025-Q4,"Garment Care",Phone,75.00,false
+ORD-04969,Central,2025-12-19,2025-12,2025-Q4,"Garment Care",Phone,119.00,false
+ORD-04970,Central,2025-12-22,2025-12,2025-Q4,"Garment Care",Online,238.00,true
+ORD-04971,Central,2025-12-23,2025-12,2025-Q4,"Personal Care","In store",396.00,false
+ORD-04972,Central,2025-12-27,2025-12,2025-Q4,"Garment Care",Online,238.00,false
+ORD-04973,Westgate,2025-12-28,2025-12,2025-Q4,Kitchen,Online,598.00,false
+ORD-04974,Westgate,2025-12-29,2025-12,2025-Q4,Kitchen,Online,1196.00,false
+ORD-04975,Central,2025-12-30,2025-12,2025-Q4,Kitchen,"In store",159.00,true
+ORD-04976,Westgate,2025-12-30,2025-12,2025-Q4,Kitchen,"In store",129.00,false
+ORD-04977,Central,2025-12-31,2025-12,2025-Q4,Kitchen,"In store",318.00,false
+ORD-04978,Central,2025-12-31,2025-12,2025-Q4,"Garment Care","In store",357.00,false

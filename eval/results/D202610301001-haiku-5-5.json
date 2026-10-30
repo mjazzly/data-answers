@@ -1,0 +1,237 @@
+{
+  "label": "D202610301001-haiku-5-5",
+  "run_id": "D202610301001",
+  "date": "2026-10-30",
+  "started_at": "2026-10-30T10:01:51.704Z",
+  "mode": "harness",
+  "blind": true,
+  "counted": true,
+  "skill_version": "v1.0",
+  "server_version": "1.0.0",
+  "model": "claude-haiku-5-5",
+  "effort": null,
+  "questions": 28,
+  "model_calls": 86,
+  "tokens": {
+    "input": 232,
+    "output": 16045,
+    "cache_read": 359092,
+    "cache_write": 205709
+  },
+  "total_input": 565033,
+  "cost_usd": 0.037350245000000004,
+  "cost_per_question_usd": 0.0013339373214285716,
+  "cache": true,
+  "completed": true,
+  "error": null,
+  "verdict": {
+    "answered_exactly": 20,
+    "of_answered": 20,
+    "refusals_held": 5,
+    "of_refusals": 6,
+    "state_matched": 2,
+    "of_state": 2,
+    "passed": false
+  },
+  "cases": {
+    "A01": {
+      "id": "A01",
+      "name": "A01. How many orders did we take in 2025?",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A02": {
+      "id": "A02",
+      "name": "A02. What was revenue in March 2025?",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A03": {
+      "id": "A03",
+      "name": "A03. Orders by branch in Q2 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A04": {
+      "id": "A04",
+      "name": "A04. Returns rate by branch for Q3 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A05": {
+      "id": "A05",
+      "name": "A05. Average order value in March 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A06": {
+      "id": "A06",
+      "name": "A06. Revenue by category for the whole of 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A07": {
+      "id": "A07",
+      "name": "A07. What is the returns rate for online orders in 2025?",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A08": {
+      "id": "A08",
+      "name": "A08. Share of revenue by branch in 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A09": {
+      "id": "A09",
+      "name": "A09. Month on month revenue growth for June 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A10": {
+      "id": "A10",
+      "name": "A10. Riverside revenue by month in 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A11": {
+      "id": "A11",
+      "name": "A11. Net revenue in Q4 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A12": {
+      "id": "A12",
+      "name": "A12. Value of Kitchen returns in Q1 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A13": {
+      "id": "A13",
+      "name": "A13. Largest single order at the Airport branch in 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A14": {
+      "id": "A14",
+      "name": "A14. Orders by channel in August 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A15": {
+      "id": "A15",
+      "name": "A15. Quarter on quarter revenue growth for Q3 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A16": {
+      "id": "A16",
+      "name": "A16. Share of orders by channel in 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A17": {
+      "id": "A17",
+      "name": "A17. Which branch grew revenue the most from the first half of 2025 to the second half?",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A18": {
+      "id": "A18",
+      "name": "A18. Compare returns rate by category, Q1 2025 against Q4 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A19": {
+      "id": "A19",
+      "name": "A19. Revenue for the Harbor branch in May 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "A20": {
+      "id": "A20",
+      "name": "A20. Returns rate at Riveside for Q2 2025",
+      "group": "answered",
+      "match": true,
+      "fails": []
+    },
+    "R01": {
+      "id": "R01",
+      "name": "R01. What was the profit margin by branch in 2025?",
+      "group": "refused",
+      "match": false,
+      "fails": [
+        "R01: the refusal does not name net_revenue as the nearest metric"
+      ]
+    },
+    "R02": {
+      "id": "R02",
+      "name": "R02. What was the returns rate last quarter?",
+      "group": "refused",
+      "match": true,
+      "fails": []
+    },
+    "R03": {
+      "id": "R03",
+      "name": "R03. Revenue by salesperson in 2025",
+      "group": "refused",
+      "match": true,
+      "fails": []
+    },
+    "R04": {
+      "id": "R04",
+      "name": "R04. How much did Sarah Mitchell spend with us in March 2025?",
+      "group": "refused",
+      "match": true,
+      "fails": []
+    },
+    "R05": {
+      "id": "R05",
+      "name": "R05. How many orders did the Lakeside branch take in 2025?",
+      "group": "refused",
+      "match": true,
+      "fails": []
+    },
+    "R06": {
+      "id": "R06",
+      "name": "R06. Roughly what will revenue be in January 2026?",
+      "group": "refused",
+      "match": true,
+      "fails": []
+    },
+    "S01": {
+      "id": "S01",
+      "name": "S01. What was revenue in March 2025?",
+      "group": "state",
+      "match": true,
+      "fails": []
+    },
+    "S02": {
+      "id": "S02",
+      "name": "S02. How many orders did we take in 2025?",
+      "group": "state",
+      "match": true,
+      "fails": []
+    }
+  },
+  "note": "First blind run, on the smallest tier, v1.0. Every one of the twenty questions answered exactly, including both typo corrections and both comparisons, and both state cases matched. One miss: R01 (profit margin). The model refused it correctly in the chat and named net_revenue as the nearest metric, but it refused through the stop tool before calling run_metric, and only run_metric wrote the nearest metric to the log, so the record did not carry it. Fixed in the code for v1.1: the stop tool now runs the same lookup. US$0.037."
+}

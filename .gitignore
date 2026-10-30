@@ -1,0 +1,19 @@
+node_modules/
+.env
+eval/runs/
+eval/runs-mock/
+
+# state written by the server when it runs on data/
+data/answers.duckdb
+data/answers.duckdb.wal
+data/answers.csv
+data/run_log.csv
+data/summary_*.md
+
+# never in the public repo
+.DS_Store
+*.pdf
+*.tar.gz
+
+# the working brief stays local
+BRIEF.md

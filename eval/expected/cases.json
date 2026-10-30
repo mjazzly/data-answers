@@ -1,0 +1,717 @@
+{
+  "written": "by scripts/make_data.js from seed 20261030",
+  "rows": 4948,
+  "batch_rows": 30,
+  "data_version_after_batch": 2,
+  "cases": [
+    {
+      "id": "A01",
+      "question": "How many orders did we take in 2025?",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "orders",
+        "unit": "orders",
+        "dimensions": [],
+        "filters": {},
+        "period": "2025",
+        "rows_over": 4948,
+        "value": "4948"
+      }
+    },
+    {
+      "id": "A02",
+      "question": "What was revenue in March 2025?",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "revenue",
+        "unit": "amount",
+        "dimensions": [],
+        "filters": {},
+        "period": "2025-03",
+        "rows_over": 374,
+        "value": "97694.60"
+      }
+    },
+    {
+      "id": "A03",
+      "question": "Orders by branch in Q2 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "orders",
+        "unit": "orders",
+        "dimensions": [
+          "branch"
+        ],
+        "filters": {},
+        "period": "2025-Q2",
+        "rows_over": 1173,
+        "rows": [
+          {
+            "group": "Central",
+            "value": "198"
+          },
+          {
+            "group": "Harbour",
+            "value": "162"
+          },
+          {
+            "group": "Riverside",
+            "value": "120"
+          },
+          {
+            "group": "Hillside",
+            "value": "95"
+          },
+          {
+            "group": "Old Town",
+            "value": "111"
+          },
+          {
+            "group": "Westgate",
+            "value": "188"
+          },
+          {
+            "group": "Northpoint",
+            "value": "133"
+          },
+          {
+            "group": "Airport",
+            "value": "166"
+          }
+        ]
+      }
+    },
+    {
+      "id": "A04",
+      "question": "Returns rate by branch for Q3 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "returns_rate",
+        "unit": "%",
+        "dimensions": [
+          "branch"
+        ],
+        "filters": {},
+        "period": "2025-Q3",
+        "rows_over": 1253,
+        "rows": [
+          {
+            "group": "Central",
+            "value": "8.37"
+          },
+          {
+            "group": "Harbour",
+            "value": "9.73"
+          },
+          {
+            "group": "Riverside",
+            "value": "4.24"
+          },
+          {
+            "group": "Hillside",
+            "value": "6.06"
+          },
+          {
+            "group": "Old Town",
+            "value": "7.02"
+          },
+          {
+            "group": "Westgate",
+            "value": "12.83"
+          },
+          {
+            "group": "Northpoint",
+            "value": "15.54"
+          },
+          {
+            "group": "Airport",
+            "value": "5.63"
+          }
+        ]
+      }
+    },
+    {
+      "id": "A05",
+      "question": "Average order value in March 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "average_order_value",
+        "unit": "amount",
+        "dimensions": [],
+        "filters": {},
+        "period": "2025-03",
+        "rows_over": 374,
+        "value": "261.22"
+      }
+    },
+    {
+      "id": "A06",
+      "question": "Revenue by category for the whole of 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "revenue",
+        "unit": "amount",
+        "dimensions": [
+          "category"
+        ],
+        "filters": {},
+        "period": "2025",
+        "rows_over": 4948,
+        "rows": [
+          {
+            "group": "Kitchen",
+            "value": "543507.00"
+          },
+          {
+            "group": "Cooling",
+            "value": "436872.00"
+          },
+          {
+            "group": "Garment Care",
+            "value": "164109.00"
+          },
+          {
+            "group": "Personal Care",
+            "value": "153396.00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "A07",
+      "question": "What is the returns rate for online orders in 2025?",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "returns_rate",
+        "unit": "%",
+        "dimensions": [],
+        "filters": {
+          "channel": [
+            "Online"
+          ]
+        },
+        "period": "2025",
+        "rows_over": 1460,
+        "value": "11.78"
+      }
+    },
+    {
+      "id": "A08",
+      "question": "Share of revenue by branch in 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "revenue_share",
+        "unit": "%",
+        "dimensions": [
+          "branch"
+        ],
+        "filters": {},
+        "period": "2025",
+        "rows_over": 4948,
+        "rows": [
+          {
+            "group": "Central",
+            "value": "17.86"
+          },
+          {
+            "group": "Harbour",
+            "value": "14.14"
+          },
+          {
+            "group": "Riverside",
+            "value": "9.48"
+          },
+          {
+            "group": "Hillside",
+            "value": "7.62"
+          },
+          {
+            "group": "Old Town",
+            "value": "8.48"
+          },
+          {
+            "group": "Westgate",
+            "value": "17.22"
+          },
+          {
+            "group": "Northpoint",
+            "value": "12.25"
+          },
+          {
+            "group": "Airport",
+            "value": "12.95"
+          }
+        ]
+      }
+    },
+    {
+      "id": "A09",
+      "question": "Month on month revenue growth for June 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "mom_growth",
+        "unit": "%",
+        "dimensions": [],
+        "filters": {},
+        "period": "2025-06",
+        "value": "1.99",
+        "previous_period": "2025-05",
+        "rows_over": 803
+      }
+    },
+    {
+      "id": "A10",
+      "question": "Riverside revenue by month in 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "revenue",
+        "unit": "amount",
+        "dimensions": [
+          "month"
+        ],
+        "filters": {
+          "branch": [
+            "Riverside"
+          ]
+        },
+        "period": "2025",
+        "rows_over": 467,
+        "rows": [
+          {
+            "group": "2025-01",
+            "value": "11444.30"
+          },
+          {
+            "group": "2025-02",
+            "value": "8006.90"
+          },
+          {
+            "group": "2025-03",
+            "value": "12877.70"
+          },
+          {
+            "group": "2025-04",
+            "value": "9594.70"
+          },
+          {
+            "group": "2025-05",
+            "value": "12200.50"
+          },
+          {
+            "group": "2025-06",
+            "value": "7853.10"
+          },
+          {
+            "group": "2025-07",
+            "value": "10557.90"
+          },
+          {
+            "group": "2025-08",
+            "value": "11265.70"
+          },
+          {
+            "group": "2025-09",
+            "value": "8854.40"
+          },
+          {
+            "group": "2025-10",
+            "value": "10020.90"
+          },
+          {
+            "group": "2025-11",
+            "value": "9707.70"
+          },
+          {
+            "group": "2025-12",
+            "value": "10634.30"
+          }
+        ]
+      }
+    },
+    {
+      "id": "A11",
+      "question": "Net revenue in Q4 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "net_revenue",
+        "unit": "amount",
+        "dimensions": [],
+        "filters": {},
+        "period": "2025-Q4",
+        "rows_over": 1525,
+        "value": "359084.50"
+      }
+    },
+    {
+      "id": "A12",
+      "question": "Value of Kitchen returns in Q1 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "returned_value",
+        "unit": "amount",
+        "dimensions": [],
+        "filters": {
+          "category": [
+            "Kitchen"
+          ]
+        },
+        "period": "2025-Q1",
+        "rows_over": 423,
+        "value": "7558.10"
+      }
+    },
+    {
+      "id": "A13",
+      "question": "Largest single order at the Airport branch in 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "largest_order",
+        "unit": "amount",
+        "dimensions": [],
+        "filters": {
+          "branch": [
+            "Airport"
+          ]
+        },
+        "period": "2025",
+        "rows_over": 668,
+        "value": "1596.00"
+      }
+    },
+    {
+      "id": "A14",
+      "question": "Orders by channel in August 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "orders",
+        "unit": "orders",
+        "dimensions": [
+          "channel"
+        ],
+        "filters": {},
+        "period": "2025-08",
+        "rows_over": 423,
+        "rows": [
+          {
+            "group": "In store",
+            "value": "263"
+          },
+          {
+            "group": "Online",
+            "value": "119"
+          },
+          {
+            "group": "Phone",
+            "value": "41"
+          }
+        ]
+      }
+    },
+    {
+      "id": "A15",
+      "question": "Quarter on quarter revenue growth for Q3 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "qoq_growth",
+        "unit": "%",
+        "dimensions": [],
+        "filters": {},
+        "period": "2025-Q3",
+        "value": "-0.74",
+        "previous_period": "2025-Q2",
+        "rows_over": 2426
+      }
+    },
+    {
+      "id": "A16",
+      "question": "Share of orders by channel in 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "orders_share",
+        "unit": "%",
+        "dimensions": [
+          "channel"
+        ],
+        "filters": {},
+        "period": "2025",
+        "rows_over": 4948,
+        "rows": [
+          {
+            "group": "In store",
+            "value": "60.21"
+          },
+          {
+            "group": "Online",
+            "value": "29.51"
+          },
+          {
+            "group": "Phone",
+            "value": "10.29"
+          }
+        ]
+      }
+    },
+    {
+      "id": "A17",
+      "question": "Which branch grew revenue the most from the first half of 2025 to the second half?",
+      "expect": {
+        "tool": "compare_periods",
+        "metric": "revenue",
+        "unit": "amount",
+        "dimension": "branch",
+        "period_a": "2025-H1",
+        "period_b": "2025-H2",
+        "rows": [
+          {
+            "group": "Westgate",
+            "value_a": "89104.80",
+            "value_b": "134416.60",
+            "change": "45311.80",
+            "change_pct": "50.85"
+          },
+          {
+            "group": "Harbour",
+            "value_a": "78919.30",
+            "value_b": "104586.00",
+            "change": "25666.70",
+            "change_pct": "32.52"
+          },
+          {
+            "group": "Hillside",
+            "value_a": "44184.50",
+            "value_b": "54746.20",
+            "change": "10561.70",
+            "change_pct": "23.90"
+          },
+          {
+            "group": "Northpoint",
+            "value_a": "71469.00",
+            "value_b": "87494.40",
+            "change": "16025.40",
+            "change_pct": "22.42"
+          },
+          {
+            "group": "Central",
+            "value_a": "104820.80",
+            "value_b": "127026.90",
+            "change": "22206.10",
+            "change_pct": "21.18"
+          },
+          {
+            "group": "Old Town",
+            "value_a": "51287.80",
+            "value_b": "58718.90",
+            "change": "7431.10",
+            "change_pct": "14.49"
+          },
+          {
+            "group": "Riverside",
+            "value_a": "61977.20",
+            "value_b": "61040.90",
+            "change": "-936.30",
+            "change_pct": "-1.51"
+          },
+          {
+            "group": "Airport",
+            "value_a": "85413.80",
+            "value_b": "82676.90",
+            "change": "-2736.90",
+            "change_pct": "-3.20"
+          }
+        ],
+        "rows_over": 4948,
+        "top": "Westgate"
+      }
+    },
+    {
+      "id": "A18",
+      "question": "Compare returns rate by category, Q1 2025 against Q4 2025",
+      "expect": {
+        "tool": "compare_periods",
+        "metric": "returns_rate",
+        "unit": "%",
+        "dimension": "category",
+        "period_a": "2025-Q1",
+        "period_b": "2025-Q4",
+        "rows": [
+          {
+            "group": "Personal Care",
+            "value_a": "6.25",
+            "value_b": "8.57",
+            "change": "2.32",
+            "change_pct": "37.12"
+          },
+          {
+            "group": "Kitchen",
+            "value_a": "8.04",
+            "value_b": "9.10",
+            "change": "1.06",
+            "change_pct": "13.18"
+          },
+          {
+            "group": "Cooling",
+            "value_a": "7.59",
+            "value_b": "7.03",
+            "change": "-0.56",
+            "change_pct": "-7.38"
+          },
+          {
+            "group": "Garment Care",
+            "value_a": "9.71",
+            "value_b": "7.74",
+            "change": "-1.97",
+            "change_pct": "-20.29"
+          }
+        ],
+        "rows_over": 2522,
+        "top": "Personal Care"
+      }
+    },
+    {
+      "id": "A19",
+      "question": "Revenue for the Harbor branch in May 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "revenue",
+        "unit": "amount",
+        "dimensions": [],
+        "filters": {
+          "branch": [
+            "Harbour"
+          ]
+        },
+        "period": "2025-05",
+        "rows_over": 60,
+        "value": "13266.20",
+        "corrections": {
+          "branch": {
+            "from": "Harbor",
+            "to": "Harbour"
+          }
+        }
+      }
+    },
+    {
+      "id": "A20",
+      "question": "Returns rate at Riveside for Q2 2025",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "returns_rate",
+        "unit": "%",
+        "dimensions": [],
+        "filters": {
+          "branch": [
+            "Riverside"
+          ]
+        },
+        "period": "2025-Q2",
+        "rows_over": 120,
+        "value": "5.83",
+        "corrections": {
+          "branch": {
+            "from": "Riveside",
+            "to": "Riverside"
+          }
+        }
+      }
+    },
+    {
+      "id": "R01",
+      "question": "What was the profit margin by branch in 2025?",
+      "gate": "G1",
+      "reason": "undefined_metric",
+      "nearest": "net_revenue"
+    },
+    {
+      "id": "R02",
+      "question": "What was the returns rate last quarter?",
+      "gate": "G2",
+      "reason": "ambiguous_period",
+      "answer": "Q3 2025",
+      "then": {
+        "tool": "run_metric",
+        "metric": "returns_rate",
+        "unit": "%",
+        "dimensions": [],
+        "filters": {},
+        "period": "2025-Q3",
+        "rows_over": 1253,
+        "value": "9.18"
+      }
+    },
+    {
+      "id": "R03",
+      "question": "Revenue by salesperson in 2025",
+      "gate": "G3",
+      "reason": "dimension_not_in_table"
+    },
+    {
+      "id": "R04",
+      "question": "How much did Sarah Mitchell spend with us in March 2025?",
+      "gate": "G4",
+      "reason": "single_person"
+    },
+    {
+      "id": "R05",
+      "question": "How many orders did the Lakeside branch take in 2025?",
+      "gate": "G5",
+      "reason": "value_not_in_data",
+      "answer": "Riverside",
+      "then": {
+        "tool": "run_metric",
+        "metric": "orders",
+        "unit": "orders",
+        "dimensions": [],
+        "filters": {
+          "branch": [
+            "Riverside"
+          ]
+        },
+        "period": "2025",
+        "rows_over": 467,
+        "value": "467"
+      }
+    },
+    {
+      "id": "R06",
+      "question": "Roughly what will revenue be in January 2026?",
+      "gate": "G6",
+      "reason": "estimate",
+      "nearest": "revenue"
+    },
+    {
+      "id": "S01",
+      "question": "What was revenue in March 2025?",
+      "same_as": "A02",
+      "state": "same",
+      "expect": {
+        "tool": "run_metric",
+        "metric": "revenue",
+        "unit": "amount",
+        "dimensions": [],
+        "filters": {},
+        "period": "2025-03",
+        "rows_over": 374,
+        "value": "97694.60"
+      }
+    },
+    {
+      "id": "S02",
+      "question": "How many orders did we take in 2025?",
+      "same_as": "A01",
+      "state": "changed",
+      "load": "batch_2.csv",
+      "rows_added": 30,
+      "expect": {
+        "tool": "run_metric",
+        "metric": "orders",
+        "unit": "orders",
+        "dimensions": [],
+        "filters": {},
+        "period": "2025",
+        "rows_over": 4978,
+        "value": "4978"
+      }
+    }
+  ]
+}
