@@ -1,0 +1,18 @@
+{
+  "build": "data-answers",
+  "title": "Data answers",
+  "harness": "eval/run_eval.js",
+  "server": { "file": "server.js", "data_env": "DATA_ANSWERS_DATA" },
+  "skill": "skill/SKILL.md",
+  "data": "data",
+  "expected": "eval/expected",
+  "answers": "eval/answers.txt",
+  "prices": "eval/prices.json",
+  "checker": "eval/check.js",
+  "runs": "eval/runs",
+  "runs_mock": "eval/runs-mock",
+  "record": "result.json",
+  "gates": { "held": "refusals_held", "of": "of_refusals" },
+  "bar": "18 of the 20 answered exactly, all six refusals held, both state cases matched",
+  "max_minutes": 30
+}
