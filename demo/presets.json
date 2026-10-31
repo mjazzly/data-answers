@@ -1,0 +1,309 @@
+{
+  "recorded_at": "2026-10-31T15:11:08.305Z",
+  "run_id": "D202610312310-3132",
+  "model": "claude-haiku-5-5",
+  "cost_usd": 0.006703670000000001,
+  "items": [
+    {
+      "label": "Returns rate by branch, Q3 2025",
+      "question": "Returns rate by branch for Q3 2025",
+      "run_id": "D202610312310-3132",
+      "items": [
+        {
+          "kind": "answer",
+          "answer_id": "D202610312310-3132-P01",
+          "tool": "run_metric",
+          "metric": "returns_rate",
+          "definition": "Returns divided by orders, as a percent: the share of orders placed in the period that were later returned.",
+          "unit": "%",
+          "period": "2025-Q3",
+          "dimensions": [
+            "branch"
+          ],
+          "filters": {},
+          "rows": [
+            {
+              "group": "Central",
+              "value": "8.37"
+            },
+            {
+              "group": "Harbour",
+              "value": "9.73"
+            },
+            {
+              "group": "Riverside",
+              "value": "4.24"
+            },
+            {
+              "group": "Hillside",
+              "value": "6.06"
+            },
+            {
+              "group": "Old Town",
+              "value": "7.02"
+            },
+            {
+              "group": "Westgate",
+              "value": "12.83"
+            },
+            {
+              "group": "Northpoint",
+              "value": "15.54"
+            },
+            {
+              "group": "Airport",
+              "value": "5.63"
+            }
+          ],
+          "rows_over": 1253,
+          "data_version": 1,
+          "data_rows": 4948,
+          "sql": "SELECT branch, SUM(CASE WHEN returned THEN 1 ELSE 0 END) AS numerator, COUNT(*) AS denominator, COUNT(*) AS rows_over FROM orders WHERE month IN ('2025-07', '2025-08', '2025-09') GROUP BY branch"
+        }
+      ]
+    },
+    {
+      "label": "Average order value, March 2025",
+      "question": "Average order value in March 2025",
+      "run_id": "D202610312310-3132",
+      "items": [
+        {
+          "kind": "answer",
+          "answer_id": "D202610312310-3132-P02",
+          "tool": "run_metric",
+          "metric": "average_order_value",
+          "definition": "Revenue divided by orders: the mean order value of the orders placed in the period.",
+          "unit": "amount",
+          "period": "2025-03",
+          "dimensions": [],
+          "filters": {},
+          "value": "261.22",
+          "rows_over": 374,
+          "data_version": 1,
+          "data_rows": 4948,
+          "sql": "SELECT CAST(SUM(order_value) * 100 AS BIGINT) AS numerator, COUNT(*) AS denominator, COUNT(*) AS rows_over FROM orders WHERE month IN ('2025-03')"
+        }
+      ]
+    },
+    {
+      "label": "Which branch grew most, H1 to H2",
+      "question": "Which branch grew revenue the most from the first half of 2025 to the second half?",
+      "run_id": "D202610312310-3132",
+      "items": [
+        {
+          "kind": "answer",
+          "answer_id": "D202610312310-3132-P03",
+          "tool": "compare_periods",
+          "metric": "revenue",
+          "definition": "Sum of the order value of every order placed in the period, before returns.",
+          "unit": "amount",
+          "period_a": "2025-H1",
+          "period_b": "2025-H2",
+          "dimensions": [
+            "branch"
+          ],
+          "filters": {},
+          "rows": [
+            {
+              "group": "Westgate",
+              "value_a": "89104.80",
+              "value_b": "134416.60",
+              "change": "45311.80",
+              "change_pct": "50.85"
+            },
+            {
+              "group": "Harbour",
+              "value_a": "78919.30",
+              "value_b": "104586.00",
+              "change": "25666.70",
+              "change_pct": "32.52"
+            },
+            {
+              "group": "Hillside",
+              "value_a": "44184.50",
+              "value_b": "54746.20",
+              "change": "10561.70",
+              "change_pct": "23.90"
+            },
+            {
+              "group": "Northpoint",
+              "value_a": "71469.00",
+              "value_b": "87494.40",
+              "change": "16025.40",
+              "change_pct": "22.42"
+            },
+            {
+              "group": "Central",
+              "value_a": "104820.80",
+              "value_b": "127026.90",
+              "change": "22206.10",
+              "change_pct": "21.18"
+            },
+            {
+              "group": "Old Town",
+              "value_a": "51287.80",
+              "value_b": "58718.90",
+              "change": "7431.10",
+              "change_pct": "14.49"
+            },
+            {
+              "group": "Riverside",
+              "value_a": "61977.20",
+              "value_b": "61040.90",
+              "change": "-936.30",
+              "change_pct": "-1.51"
+            },
+            {
+              "group": "Airport",
+              "value_a": "85413.80",
+              "value_b": "82676.90",
+              "change": "-2736.90",
+              "change_pct": "-3.20"
+            }
+          ],
+          "rows_over": 4948,
+          "data_version": 1,
+          "data_rows": 4948,
+          "sql": [
+            "SELECT branch, CAST(SUM(order_value) * 100 AS BIGINT) AS value_cents, COUNT(*) AS rows_over FROM orders WHERE month IN ('2025-01', '2025-02', '2025-03', '2025-04', '2025-05', '2025-06') GROUP BY branch",
+            "SELECT branch, CAST(SUM(order_value) * 100 AS BIGINT) AS value_cents, COUNT(*) AS rows_over FROM orders WHERE month IN ('2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12') GROUP BY branch"
+          ],
+          "change_note": "change is in amount; change_pct is the change as a percent of the first period; rows are ranked by change_pct, highest first"
+        }
+      ]
+    },
+    {
+      "label": "Share of revenue by branch, 2025",
+      "question": "Share of revenue by branch in 2025",
+      "run_id": "D202610312310-3132",
+      "items": [
+        {
+          "kind": "answer",
+          "answer_id": "D202610312310-3132-P04",
+          "tool": "run_metric",
+          "metric": "revenue_share",
+          "definition": "A group's revenue divided by the revenue of every group in the period, as a percent. One dimension is required: the groups are its values.",
+          "unit": "%",
+          "period": "2025",
+          "dimensions": [
+            "branch"
+          ],
+          "filters": {},
+          "rows": [
+            {
+              "group": "Central",
+              "value": "17.86"
+            },
+            {
+              "group": "Harbour",
+              "value": "14.14"
+            },
+            {
+              "group": "Riverside",
+              "value": "9.48"
+            },
+            {
+              "group": "Hillside",
+              "value": "7.62"
+            },
+            {
+              "group": "Old Town",
+              "value": "8.48"
+            },
+            {
+              "group": "Westgate",
+              "value": "17.22"
+            },
+            {
+              "group": "Northpoint",
+              "value": "12.25"
+            },
+            {
+              "group": "Airport",
+              "value": "12.95"
+            }
+          ],
+          "rows_over": 4948,
+          "data_version": 1,
+          "data_rows": 4948,
+          "sql": "SELECT branch AS group_value, CAST(SUM(order_value) * 100 AS BIGINT) AS value_cents, COUNT(*) AS rows_over FROM orders WHERE month IN ('2025-01', '2025-02', '2025-03', '2025-04', '2025-05', '2025-06', '2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12') GROUP BY branch"
+        }
+      ]
+    },
+    {
+      "label": "Harbor branch revenue, May 2025",
+      "question": "Revenue for the Harbor branch in May 2025",
+      "run_id": "D202610312310-3132",
+      "items": [
+        {
+          "kind": "answer",
+          "answer_id": "D202610312310-3132-P05",
+          "tool": "run_metric",
+          "metric": "revenue",
+          "definition": "Sum of the order value of every order placed in the period, before returns.",
+          "unit": "amount",
+          "period": "2025-05",
+          "dimensions": [],
+          "filters": {
+            "branch": [
+              "Harbour"
+            ]
+          },
+          "correction_note": "branch read as Harbour from \"Harbor\"",
+          "value": "13266.20",
+          "rows_over": 60,
+          "data_version": 1,
+          "data_rows": 4948,
+          "sql": "SELECT CAST(SUM(order_value) * 100 AS BIGINT) AS value_cents, COUNT(*) AS rows_over FROM orders WHERE month IN ('2025-05') AND branch IN ('Harbour')"
+        }
+      ]
+    },
+    {
+      "label": "Profit margin by branch",
+      "question": "What was the profit margin by branch in 2025?",
+      "run_id": "D202610312310-3132",
+      "items": [
+        {
+          "kind": "refusal",
+          "gate": "G1",
+          "reason": "undefined_metric",
+          "message": "\"profit margin\" is not a defined metric, so this system cannot compute it. The nearest defined metric is net_revenue: Revenue minus returned value: the order value of the orders placed in the period that were not returned. The defined metrics are: orders, revenue, returns, returns_rate, returned_value, net_revenue, average_order_value, largest_order, mom_growth, qoq_growth, revenue_share, orders_share.",
+          "nearest": "net_revenue"
+        }
+      ]
+    },
+    {
+      "label": "Returns rate last quarter",
+      "question": "What was the returns rate last quarter?",
+      "run_id": "D202610312310-3132",
+      "items": [
+        {
+          "kind": "stop",
+          "gate": "G2",
+          "reason": "ambiguous_period",
+          "message": "\"last quarter\" is relative and this system has no reference date, so it cannot say which period that is. Which period is meant: a year (2025), a month (2025-03), a quarter (2025-Q3), a half (2025-H1) or a month range (2025-01 to 2025-06)?",
+          "period_forms": [
+            "a year 2025",
+            "a month 2025-03",
+            "a quarter 2025-Q3",
+            "a half 2025-H1",
+            "a month range 2025-01 to 2025-06"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Revenue in January 2026, roughly",
+      "question": "Roughly what will revenue be in January 2026?",
+      "run_id": "D202610312310-3132",
+      "items": [
+        {
+          "kind": "refusal",
+          "gate": "G6",
+          "reason": "estimate",
+          "message": "This system computes from the data it holds and does not estimate or forecast."
+        }
+      ]
+    }
+  ]
+}
