@@ -1,0 +1,50 @@
+# The demo's own record and alerts. No secret is needed: the numbers come from the demo's public
+# /api/stats, and the job writes with the repository's own token.
+#   Hourly: if this month's counted spend has crossed 50% or 75% of the workspace limit (the app
+#           closes free text at 75%), open one issue for that line. GitHub emails the owner.
+#   Daily, 8:10 AM Kuala Lumpur time (00:10 UTC): write the UTC day that just ended to results/.
+name: demo record
+on:
+  schedule:
+    - cron: "10 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: write
+concurrency: demo-record
+env:
+  DEMO_URL: ${{ vars.DEMO_URL }}
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    if: ${{ vars.DEMO_URL != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Alert lines
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          s=$(curl -fsS "$DEMO_URL/api/stats")
+          share=$(echo "$s" | jq -r '.share_of_workspace // 0')
+          month=$(echo "$s" | jq -r '.month')
+          cost=$(echo "$s" | jq -r '.cost_month_usd')
+          limit=$(echo "$s" | jq -r '.workspace_limit_usd')
+          for line in 50 75; do
+            if awk "BEGIN{exit !($share*100 >= $line)}"; then
+              title="Demo spend crossed ${line}% of the workspace limit, $month"
+              if [ -z "$(gh issue list --state all --search "\"$title\" in:title" --json number -q '.[0].number')" ]; then
+                gh issue create --title "$title" --body "Counted spend this month is US\$$cost of the US\$$limit workspace limit. At 75% the app closes free text until the month ends; presets keep working. To close it now: Upstash console, CLI tab, \`SET da:free_text off\`. @mjazzly"
+              fi
+            fi
+          done
+      - name: Daily record
+        run: |
+          [ "$(date -u +%H)" = "00" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ] || exit 0
+          day=$(date -u -d yesterday +%F)
+          [ "${{ github.event_name }}" = "workflow_dispatch" ] && day=$(date -u +%F)
+          f="results/demo-$day.json"
+          curl -fsS "$DEMO_URL/api/stats?day=$day" | jq --arg at "$(date -u +%FT%TZ)" '{day, questions, daily_cap, ip_cap, cost_day_usd, month, cost_month_usd, month_questions, blocked, free_text, model, written_at: $at}' > "$f"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$f"
+          git diff --cached --quiet || { git commit -m "Record the demo's day $day: questions and cost"; git push; }

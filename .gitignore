@@ -17,3 +17,4 @@ data/summary_*.md
 
 # the working brief stays local
 BRIEF.md
+eval/runs-demo/

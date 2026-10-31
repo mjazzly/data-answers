@@ -1,0 +1,35 @@
+/* Demo-only rules, in the site's terms: white panels, no shadows, no coloured edges, amber for stops. */
+.sprite{display:none}
+header.hero{padding:56px 0 24px}
+#ask{padding-top:16px}
+.askbox{display:grid;gap:12px}
+.askbox .side-head{margin-bottom:0}
+.askbox textarea{width:100%;resize:vertical;min-height:72px;padding:14px 16px;border:0;border-radius:var(--radius-s);background:var(--paper);font:inherit;font-size:16px;line-height:1.5;color:var(--ink)}
+.askbox textarea:focus-visible{outline:2px solid var(--marine);outline-offset:0}
+.askbox textarea:disabled{color:var(--ink-faint)}
+.ask-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ask-row .count{font-size:12.5px;color:var(--ink-faint)}
+.askbox button{appearance:none;border:0;cursor:pointer;padding:10px 22px;border-radius:999px;background:var(--marine);color:#fff;font:inherit;font-weight:700;font-size:15px;transition:background-color .15s}
+.askbox button:hover{background:var(--marine-deep)}
+.askbox button:disabled{cursor:default;background:var(--marine-tint-2);color:var(--marine)}
+.notice{display:flex;align-items:center;gap:12px;font-size:14.5px;line-height:1.55;color:var(--ink-soft)}
+.presets-head{margin:28px 0 12px;font-weight:600}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.preset{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;background:var(--panel);font:inherit;font-weight:600;font-size:14px;color:var(--marine);text-align:left;transition:background-color .15s,color .15s}
+.preset:hover{background:var(--marine-tint)}
+.preset.on{background:var(--marine);color:#fff}
+.preset:focus-visible{outline:2px solid var(--marine);outline-offset:2px}
+.preset .gate-mark{font-size:11.5px;font-weight:700;padding:0 7px;border-radius:999px;background:var(--amber-tint);color:var(--amber)}
+#answer{padding-top:8px}
+#answer:empty{padding:0}
+.asked{display:flex;gap:12px;align-items:baseline;font-size:17px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.asked .mono{font-size:12.5px;font-weight:400;color:var(--ink-faint)}
+#answer .out-run{margin:0 0 16px}
+.ask-again{margin-top:10px;font-size:13.5px;color:var(--ink-soft)}
+.scroll{overflow-x:auto}
+.tally{margin:12px 0 0}
+.tally .ic{color:var(--marine)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.ans .sql{white-space:pre-wrap}
+.presets-head span:last-child b{margin-right:0}
+.presets-head{flex-wrap:nowrap}

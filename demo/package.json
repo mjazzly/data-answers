@@ -1,0 +1,30 @@
+{
+  "name": "data-answers-demo",
+  "version": "1.1.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "core": "node scripts/copy-core.js",
+    "predev": "node scripts/copy-core.js",
+    "dev": "next dev",
+    "prebuild": "node scripts/copy-core.js",
+    "build": "next build",
+    "start": "next start",
+    "presets": "node scripts/copy-core.js && node scripts/record-presets.js",
+    "check": "node scripts/copy-core.js && node scripts/check-demo.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
+    "@duckdb/node-api": "^1.5.6-r.2",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@upstash/redis": "^1.40.0",
+    "botid": "^1.5.12",
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^3.25.76"
+  }
+}

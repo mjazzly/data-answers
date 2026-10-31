@@ -1,6 +1,6 @@
 {
   "name": "data-answers",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Tool server and eval harness for data answers: questions about a business table answered only through metrics defined in code. The model chooses the metric and the filters; the code runs the query, builds the answer block and stops at six gates rather than guess. Synthetic data only.",
   "type": "module",
   "main": "server.js",

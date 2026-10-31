@@ -36,6 +36,9 @@ Synthetic data only. The table in `data/orders.csv` comes from `scripts/make_dat
 | `eval/results/` | One record per counted run: model, calls, tokens, cost, verdict, every case. |
 | `eval/EXEMPLAR.md` | The living record, rebuilt from `eval/results/` after every run. |
 | `eval/prices.json` | The price table the cost is computed from, with its source and date. |
+| `lib/tools.js` | The seven tools, registered once; `server.js` serves them over stdio, the demo in memory. |
+| `demo/` | The public demo: one Next.js page on Vercel with every cost and abuse control. See `demo/README.md`. |
+| `results/` | One record a day of the demo's questions and cost, written by `.github/workflows/demo-record.yml`. |
 
 ## Run it
 
