@@ -13,8 +13,6 @@ export const metadata = {
   icons: { icon: [{ url: `${SITE}/favicon.svg`, type: "image/svg+xml" }, { url: `${SITE}/favicon-32.png`, sizes: "32x32" }], apple: `${SITE}/apple-touch-icon.png` },
 };
 
-const NAV = [["built.html", "Built"], ["aiwork.html", "AI Work"], ["casefiles.html", "Case Files"], ["index.html", "Systems"], ["operator.html", "Operator"], ["models.html", "Models"], ["knowledge.html", "Knowledge"], ["chapters.html", "Chapters"]];
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -28,7 +26,7 @@ export default function RootLayout({ children }) {
         <nav className="top"><div className="wrap">
           <a className="brand" href={`${SITE}/index.html`}><span className="seam silver" aria-hidden="true"></span><span className="brand-name">Megat Jazly</span><span className="seam" aria-hidden="true"></span></a>
           <div className="links">
-            {NAV.map(([href, name]) => <a key={href} href={`${SITE}/${href}`} className={name === "AI Work" ? "active" : undefined}>{name}</a>)}
+            <a href={`${SITE}/aiwork.html#work-03`}>Back to AI Work</a>
           </div>
         </div></nav>
         <div className="wrap">
