@@ -18,3 +18,6 @@ data/summary_*.md
 # the working brief stays local
 BRIEF.md
 eval/runs-demo/
+
+# the gate brief stays local
+GATE-BRIEF.md
