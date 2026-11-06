@@ -27,13 +27,26 @@ class Memory {
   async mget(...ks) { return ks.map((k) => this.m.get(k) ?? null); }
   async expire() { return 1; }
 }
+// The database is shared: the meeting tracker keeps its state in it under its own prefix. So the app never talks
+// to the client directly. It gets this wrapper, which offers only the commands below and throws on any
+// key that does not start with da:, so a wrong key fails shut. No listing or flushing command exists here.
+const PREFIX = "da:";
+const ONE_KEY = ["incr", "incrby", "decr", "get", "set", "expire"], ALL_KEYS = ["mget", "del"];
+export function guarded(client) {
+  const check = (k) => { if (typeof k !== "string" || !k.startsWith(PREFIX)) throw new Error(`refused: key ${JSON.stringify(k)} is outside ${PREFIX}`); };
+  const w = {};
+  for (const op of ONE_KEY) w[op] = (k, ...rest) => { check(k); return client[op](k, ...rest); };
+  for (const op of ALL_KEYS) w[op] = (...ks) => { if (!ks.length) check(undefined); ks.forEach(check); return client[op](...ks); };
+  return Object.freeze(w);
+}
+
 let db;
 export function store() {
   if (db) return db;
   const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
-  if (url && token) db = new Redis({ url, token, automaticDeserialization: false });
-  else if (process.env.DEMO_LOCAL === "1" && !process.env.VERCEL) db = globalThis.__daMemory ??= new Memory();
+  if (url && token) db = guarded(new Redis({ url, token, automaticDeserialization: false }));
+  else if (process.env.DEMO_LOCAL === "1" && !process.env.VERCEL) db = guarded(globalThis.__daMemory ??= new Memory());
   else throw new Error("no Redis configured");
   return db;
 }
