@@ -23,7 +23,7 @@ Four more, found while reading the code and Vercel's docs:
 | # | Decision | Recommended | Alternative |
 |---|---|---|---|
 | 8 | A second guard on the branch | The `ignoreCommand` also skips any build whose branch is not `live` (`VERCEL_GIT_COMMIT_REF`). Vercel matches `deploymentEnabled` keys with minimatch, where `*` does not cross a `/`, so a branch such as `fix/x` would match no rule and fall back to deploying. The docs do not say otherwise either way; this guard makes it not matter | `deploymentEnabled` alone, as WORK-08 |
-| 9 | Node on the runner | 24, with `actions/checkout@v5` and `actions/setup-node@v5`. Node 20 passed end of life in April 2026; the Mac runs 24.18. If the Vercel project's Node setting is not 24, match Vercel instead | 20, as WORK-08 |
+| 9 | Node on the runner | 26, matching the Vercel project's Node setting (26.x, seen 6 Nov 2026), with `actions/checkout@v5` and `actions/setup-node@v5`. Node 20 passed end of life in April 2026; the Mac runs 24.18 for the offline tests | 20, as WORK-08 |
 | 10 | Where the catch-up starts | A fixed first day, `2026-10-31` (the demo's first record), and never more than 35 days back, so no file is written for a day before the demo existed. A dispatch writes finished days only; today's partial day is no longer written | 35 days back only, which would write 26 empty files for October; or keep writing today on dispatch |
 | 11 | How the key scan reads | It looks for the Redis commands as code uses them (`.keys(` other than `Object.keys(`, `.scan(`, `.flushdb(`, `.flushall(`, the quoted names `"KEYS"`, `"SCAN"`, `"FLUSHDB"`, `"FLUSHALL"`) and for `mt:` anywhere, in `.js`, `.mjs`, `.json` and `.yml` files. A bare-word scan for `KEYS` would hit `export const KEYS` in `lib/limits.js`, the export test 1 below reads | Rename the export and scan bare words |
 
@@ -73,7 +73,7 @@ Checked against Vercel's docs on 6 Nov 2026:
 - `git.deploymentEnabled` is the current key (`github.enabled` is the deprecated one). Keys use minimatch; "if a branch matches multiple rules and at least one rule is `true`, a deployment will occur", so `live` builds and every branch without a `/` does not. Decision 8 covers the rest.
 - `VERCEL_GIT_PREVIOUS_SHA` is "the git SHA of the last successful deployment for the project and branch", empty on a branch's first deployment, and exposed only when an Ignored Build Step is set. It replaces `HEAD^`: `live` can move several commits at once, and `HEAD^` would skip a build whose demo change sits in an earlier commit.
 - Exit 0 skips the build; 1 builds. Vercel clones 10 commits deep, so an older previous SHA makes `git diff` fail; `&& exit 0 || exit 1` turns every failure, and the empty variable on the first `live` build, into a build. That is the safe side.
-- The variables reach the command only when the project's "Automatically expose System Environment Variables" box is on. If it were off, the branch guard would skip every build and production would keep serving its current deployment, which is safe but would stall. Megat looks at that box in step 3; it is not changed.
+- The variables reach the command only when the project's "Enable access to System Environment Variables" box is on (Vercel's older name: "Automatically expose System Environment Variables"). If it were off, the branch guard would skip every build and production would keep serving its current deployment, which is safe but would stall. Megat looks at that box in step 3; it is not changed.
 
 The path list is the one the file has today, unchanged.
 
@@ -95,8 +95,11 @@ The path list is the one the file has today, unchanged.
    3. Megat moves production from `demo` to `live`, then promotes that `live` deployment to production in Vercel. If Vercel rebuilds it on promotion with the production settings, that build is the one checked.
    4. Check by effect, as in A3.
 
+   **Taken: Order B.** On 6 Nov 2026 Vercel refused `live` with the message: Branch "live" not found in the connected Git repository; production stays on `demo` until the first green run creates `live`.
+
    In either order, if the run is red, `live` does not exist or does not move, production is untouched, and the misses are reported by case and line.
 5. **The push to `main` is never forced.** If `git push origin gate:main` is rejected because `origin/main` moved (a `[ci]` or daily record commit, say), Claude Code fetches, merges the new `origin/main` into `gate` (no rebase, no force), reruns every offline test in section 6, shows the results, and asks Megat before pushing again.
+   The Root Directory switch "Skip deployment" (skip when nothing changed) is on and is left alone: Vercel applies it only to monorepos with declared workspaces, and this repo declares none, so the `ignoreCommand` decides every build.
 6. `demo` is frozen from step 2: no more pushes. Deleting it waits for Megat's word after `live` has served a day.
 7. Nobody pushes `live` by hand, Claude Code included. Only step 4 of the workflow moves it.
 
@@ -110,7 +113,7 @@ Each is Megat's to create or change. Each is checked by its effect (a run starts
 | `data-answers-actions` | fine-grained token: Actions read and write on `mjazzly/data-answers` only | cron-job.org only, in the two jobs' Authorization header | Megat | 90 days from creation |
 | `DEMO_URL` | `https://data-answers.vercel.app` | GitHub repository variable, exists | unchanged | never |
 | Production branch | `demo` to `live` | Vercel, project `data-answers`, Settings, Environments, Production, Branch Tracking | Megat | never |
-| System environment variables | "Automatically expose System Environment Variables" | Vercel project settings | Megat looks; not changed | never |
+| System environment variables | "Enable access to System Environment Variables" | Vercel project settings | Megat looks; not changed | never |
 | The workflow's own token | `contents: write`, given per run | GitHub, built in | none | each run |
 
 The demo's own Vercel settings (its key, `IP_SALT`, the caps, Upstash) are unchanged. CI never connects to Upstash: no `UPSTASH_*` or `KV_*` variable is set in either workflow, and test 1 checks that.
