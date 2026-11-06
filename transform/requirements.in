@@ -1,0 +1,6 @@
+# The three pins for the tested tables (transform/DESIGN.md, decision 1). The full lock is
+# requirements.txt, written from this file by:
+#   uv pip compile --universal transform/requirements.in -o transform/requirements.txt
+dbt-core==1.12.6
+dbt-duckdb==1.11.1
+duckdb==1.5.6

@@ -1,0 +1,21 @@
+version: 2
+
+# The raw export lands as text, every column, exactly as it arrives; staging does all the casting.
+seeds:
+  - name: raw_orders
+    description: The order export as it arrives, two batches marked by export_batch. Written by scripts/make_raw.js.
+    config:
+      column_types: { order_id: varchar, branch_code: varchar, ordered_at: varchar, category: varchar, channel: varchar, order_value: varchar, export_batch: varchar }
+  - name: raw_returns
+    description: The return events as they arrive, some logged twice. Written by scripts/make_raw.js.
+    config:
+      column_types: { return_id: varchar, order_id: varchar, returned_at: varchar, export_batch: varchar }
+  - name: branch_codes
+    description: The branch each export code stands for. The names are checked against metrics.json by test/vocab.js.
+    config:
+      column_types: { code: varchar, branch: varchar }
+    columns:
+      - name: code
+        data_tests: [unique]
+      - name: branch
+        data_tests: [unique]

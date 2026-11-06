@@ -1,0 +1,105 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: One row per order, trimmed, mapped, cast and derived from raw_orders.
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]   # G1, G2: unique also catches a repeat with different values
+      - name: branch_code
+        data_tests:
+          - relationships:               # G3: an unknown branch code fails here
+              arguments: { to: ref('branch_codes'), field: code }
+
+  - name: stg_returns
+    description: One row per returned order, from the return events.
+    columns:
+      - name: order_id
+        data_tests:
+          - unique                       # G6
+          - relationships:               # G7: every return points at an order
+              arguments: { to: ref('stg_orders'), field: order_id }
+
+unit_tests:
+  - name: u1_identical_repeat_kept_once
+    model: stg_orders
+    given:
+      - input: ref('raw_orders')
+        rows:
+          - { order_id: ORD-1, branch_code: BR-01, ordered_at: "2025-03-04 15:22:10", category: Kitchen, channel: Online, order_value: "75.00", export_batch: "1" }
+          - { order_id: ORD-1, branch_code: BR-01, ordered_at: "2025-03-04 15:22:10", category: Kitchen, channel: Online, order_value: "75.00", export_batch: "1" }
+      - input: ref('branch_codes')
+        rows: [{ code: BR-01, branch: Central }]
+    expect:
+      rows:
+        - { order_id: ORD-1, branch: Central, order_value: 75.00 }
+
+  - name: u2_conflicting_repeat_keeps_both_rows
+    model: stg_orders
+    description: Both rows survive staging, so the unique test on order_id turns red rather than one row being picked.
+    given:
+      - input: ref('raw_orders')
+        rows:
+          - { order_id: ORD-1, branch_code: BR-01, ordered_at: "2025-03-04 15:22:10", category: Kitchen, channel: Online, order_value: "75.00", export_batch: "1" }
+          - { order_id: ORD-1, branch_code: BR-01, ordered_at: "2025-03-04 15:22:10", category: Kitchen, channel: Online, order_value: "80.00", export_batch: "1" }
+      - input: ref('branch_codes')
+        rows: [{ code: BR-01, branch: Central }]
+    expect:
+      rows:
+        - { order_id: ORD-1, order_value: 75.00 }
+        - { order_id: ORD-1, order_value: 80.00 }
+
+  - name: u3_text_lands_on_the_metrics_spelling
+    model: stg_orders
+    given:
+      - input: ref('raw_orders')
+        rows:
+          - { order_id: ORD-1, branch_code: BR-01, ordered_at: "2025-03-04 15:22:10", category: " garment  care", channel: " In Store ", order_value: "75.00", export_batch: "1" }
+          - { order_id: ORD-2, branch_code: BR-01, ordered_at: "2025-03-04 15:22:10", category: "PERSONAL CARE", channel: "in store", order_value: "75.00", export_batch: "1" }
+          - { order_id: ORD-3, branch_code: BR-01, ordered_at: "2025-03-04 15:22:10", category: " Kitchen ", channel: "IN STORE", order_value: "75.00", export_batch: "1" }
+      - input: ref('branch_codes')
+        rows: [{ code: BR-01, branch: Central }]
+    expect:
+      rows:
+        - { order_id: ORD-1, category: Garment Care, channel: In store }
+        - { order_id: ORD-2, category: Personal Care, channel: In store }
+        - { order_id: ORD-3, category: Kitchen, channel: In store }
+
+  - name: u4_amount_with_a_separator
+    model: stg_orders
+    given:
+      - input: ref('raw_orders')
+        rows:
+          - { order_id: ORD-1, branch_code: BR-01, ordered_at: "2025-03-04 15:22:10", category: Kitchen, channel: Online, order_value: "1,250.00", export_batch: "1" }
+          - { order_id: ORD-2, branch_code: BR-01, ordered_at: "2025-03-04 15:22:10", category: Kitchen, channel: Online, order_value: "75.00", export_batch: "1" }
+      - input: ref('branch_codes')
+        rows: [{ code: BR-01, branch: Central }]
+    expect:
+      rows:
+        - { order_id: ORD-1, order_value: 1250.00 }
+        - { order_id: ORD-2, order_value: 75.00 }
+
+  - name: u5_date_parts_from_the_timestamp
+    model: stg_orders
+    given:
+      - input: ref('raw_orders')
+        rows:
+          - { order_id: ORD-1, branch_code: BR-01, ordered_at: "2025-03-04 15:22:10", category: Kitchen, channel: Online, order_value: "75.00", export_batch: "1" }
+          - { order_id: ORD-2, branch_code: BR-01, ordered_at: "2025-12-31 21:59:59", category: Kitchen, channel: Online, order_value: "75.00", export_batch: "1" }
+      - input: ref('branch_codes')
+        rows: [{ code: BR-01, branch: Central }]
+    expect:
+      rows:
+        - { order_id: ORD-1, order_date: 2025-03-04, month: 2025-03, quarter: 2025-Q1 }
+        - { order_id: ORD-2, order_date: 2025-12-31, month: 2025-12, quarter: 2025-Q4 }
+
+  - name: u6_return_logged_twice_counts_once
+    model: stg_returns
+    given:
+      - input: ref('raw_returns')
+        rows:
+          - { return_id: RET-1, order_id: ORD-1, returned_at: "2025-03-10 09:00:00", export_batch: "1" }
+          - { return_id: RET-2, order_id: ORD-1, returned_at: "2025-03-12 10:30:00", export_batch: "1" }
+    expect:
+      rows:
+        - { order_id: ORD-1, returned_at: "2025-03-10 09:00:00", events: 2, export_batch: 1 }

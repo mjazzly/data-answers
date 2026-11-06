@@ -1,5 +1,8 @@
 # The gate between a change and the live demo (demo/GATE.md). On every push to any branch, and on
 # dispatch (the weekly rerun from cron-job.org calls the dispatch endpoint for main):
+#   0. No key: the tested tables (transform/DESIGN.md). The raw export must be what scripts/make_raw.js
+#      writes, dbt build runs every model and test on it, and the export from fct_orders must equal
+#      data/orders.csv and data/batch_2.csv byte for byte, so a bad row stops the run here.
 #   1. No key: the harness mock, the demo's mock check, the demo's tests, the demo's build.
 #   2. With the data-answers-ci workspace key: the twenty-eight cases through the demo's own path on the
 #      smallest model, marked by eval/check.js against the bar in harness.json (demo/scripts/ci.js; one
@@ -54,6 +57,21 @@ jobs:
       - run: npm ci
       - run: npm ci
         working-directory: demo
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: transform/requirements.txt
+      - run: pip install -r transform/requirements.txt
+      - name: Tested tables with no key
+        run: |
+          node scripts/make_raw.js
+          git diff --exit-code -- transform/seeds/raw
+          (cd transform && dbt build)
+          node scripts/export_mart.js
+          cmp data/orders.csv transform/target/export/orders.csv
+          cmp data/batch_2.csv transform/target/export/batch_2.csv
+          node test/vocab.js
       - name: Tests with no key
         run: |
           npm run mock
@@ -72,6 +90,9 @@ jobs:
           [ -n "$EFFORT" ] && args+=(--effort "$EFFORT")
           [ "$GITHUB_REF" = refs/heads/main ] && args+=(--record "$dir")
           node demo/scripts/ci.js "${args[@]}"
+      - name: Add the tested tables to the record
+        if: always() && github.ref == 'refs/heads/main' && (steps.cases.outcome == 'success' || steps.cases.outcome == 'failure')
+        run: node scripts/record_models.js "$([ "$MEASURE" != "0" ] && echo results/ci-measure || echo results/ci)"
       - name: Keep the record
         if: always() && github.ref == 'refs/heads/main' && (steps.cases.outcome == 'success' || steps.cases.outcome == 'failure')
         run: |

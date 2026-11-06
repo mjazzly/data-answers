@@ -1,0 +1,34 @@
+# The tested tables (transform/DESIGN.md). Run from transform/: the warehouse and the Parquet hand-off
+# are written under target/ relative to it.
+#   cd transform && dbt build
+name: data_answers
+version: "1.2.0"
+config-version: 2
+profile: data_answers
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+clean-targets: ["target", "logs"]
+
+flags:
+  send_anonymous_usage_stats: false
+  version_check: false
+
+vars:
+  # The sum of edgeSpaced over both batches in scripts/make_raw.js: category and channel values written
+  # with a leading or trailing space, counted over the distinct raw order rows. Checked by
+  # assert_raw_keeps_edge_spaces.
+  raw_edge_spaced: { category: 202, channel: 202 }
+
+seeds:
+  data_answers:
+    +quote_columns: false
+
+models:
+  data_answers:
+    staging:
+      +materialized: view
+    mart:
+      +materialized: table

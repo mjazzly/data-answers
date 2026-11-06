@@ -1,0 +1,9 @@
+# DuckDB in a local file under target/, so no secret and no server. dbt reads this file because it
+# sits in the folder dbt runs from.
+data_answers:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: target/warehouse.duckdb
+      threads: 1

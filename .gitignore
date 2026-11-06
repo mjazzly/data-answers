@@ -24,3 +24,14 @@ GATE-BRIEF.md
 
 # local Claude Code settings and launch configs, at any depth
 .claude/
+
+# the tested tables: dbt's build output and the local Python, never committed
+transform/target/
+transform/logs/
+transform/dbt_packages/
+transform/.venv/
+transform/*.duckdb
+.user.yml
+
+# the Project D brief stays local
+PROJECT-D-BRIEF.md

@@ -13,6 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { amount, ratePct, average, growthPct, divideHundredths, fmt2 } from "../lib/round.js";
+import { csvText } from "./csv.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.dirname(here);
@@ -76,8 +77,7 @@ batch.sort((a, b) => a.order_date.localeCompare(b.order_date));
 batch.forEach((r, i) => (r.order_id = `ORD-${String(rows.length + i + 1).padStart(5, "0")}`));
 
 const HEAD = ["order_id", "branch", "order_date", "month", "quarter", "category", "channel", "order_value", "returned"];
-const csv = (rs) => [HEAD.join(","), ...rs.map((r) => [r.order_id, q(r.branch), r.order_date, r.month, r.quarter, q(r.category), q(r.channel), amount(r.cents), r.returned].join(","))].join("\n") + "\n";
-const q = (s) => (/[", ]/.test(s) ? `"${s}"` : s);
+const csv = (rs) => csvText(HEAD, rs.map((r) => [r.order_id, r.branch, r.order_date, r.month, r.quarter, r.category, r.channel, amount(r.cents), r.returned]));
 fs.writeFileSync(path.join(DATA, "orders.csv"), csv(rows));
 fs.writeFileSync(path.join(DATA, "batch_2.csv"), csv(batch));
 

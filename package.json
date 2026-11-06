@@ -1,6 +1,6 @@
 {
   "name": "data-answers",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Tool server and eval harness for data answers: questions about a business table answered only through metrics defined in code. The model chooses the metric and the filters; the code runs the query, builds the answer block and stops at six gates rather than guess. Synthetic data only.",
   "type": "module",
   "main": "server.js",
@@ -8,7 +8,10 @@
     "start": "node server.js",
     "data": "node scripts/make_data.js",
     "mock": "node eval/run_eval.js --mock",
-    "eval": "node eval/run_eval.js"
+    "eval": "node eval/run_eval.js",
+    "raw": "node scripts/make_raw.js",
+    "models": "cd transform && dbt build",
+    "export": "node scripts/export_mart.js"
   },
   "author": "Megat Jazly",
   "license": "UNLICENSED",

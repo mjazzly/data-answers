@@ -1,4 +1,4 @@
-# Data Answers, v1.1
+# Data Answers, v1.2
 
 A business table holds one row per order: branch, date, category, channel, order value, whether it was returned. People ask questions about it all day ("returns rate by branch for Q3", "which branch grew most", "average order value in March") and each one goes to an analyst who writes a query, checks it and sends a number back. This build answers those questions in a chat, and **every number comes from a metric defined in code**: the model chooses which metric and which filters, the code runs the query, and the answer carries the metric's definition, the filters applied, the row count it was computed over, the data version and a run id. The model never writes SQL and never sees a row. A question that needs a metric nobody has defined is refused with the reason and the nearest defined metric offered.
 
@@ -13,7 +13,7 @@ The model chooses and reads back; the code computes and checks. The six gates ar
 
 Every answer block also carries a lineage line: the first answer to a question, "same as" an earlier answer to the same question on the same data, or "data changed since" that answer with the rows added.
 
-Synthetic data only. The table in `data/orders.csv` comes from `scripts/make_data.js`, a seeded generator, and the expected answers in `eval/expected/cases.json` come from the same run of it. Nothing in the data places the business in a country: the branches are place types, amounts carry no currency.
+Synthetic data only. The table in `data/orders.csv` comes from `scripts/make_data.js`, a seeded generator, and the expected answers in `eval/expected/cases.json` come from the same run of it. Every push also rebuilds that table from a messy raw export through tested tables before any question is asked (below, "The tested tables"). Nothing in the data places the business in a country: the branches are place types, amounts carry no currency.
 
 ## Files
 
@@ -26,6 +26,12 @@ Synthetic data only. The table in `data/orders.csv` comes from `scripts/make_dat
 | `metrics.json` | The twelve metrics: name, definition, SQL template, unit, allowed dimensions, near words for the nearest-metric line. The dimensions and their accepted values. |
 | `scripts/make_data.js` | The truth generator. Writes `data/orders.csv`, `data/batch_2.csv` and every expected answer from one seed. |
 | `scripts/load_batch.js` | Loads more rows and moves the data version on. The model has no such tool. |
+| `scripts/make_raw.js` | Writes the raw export in `transform/seeds/raw/` from the two clean files, with five kinds of mess and seeded counts. |
+| `scripts/export_mart.js` | Writes `fct_orders` back to the two CSVs in `transform/target/export/`, only after a dbt build in which every test passed. |
+| `scripts/csv.js` | The one CSV writer, shared by the generator, the raw export and the export from the tested tables. |
+| `scripts/record_models.js` | Adds the dbt version and the test counts to the gate's record. |
+| `transform/` | The tested tables: a dbt project on DuckDB. Seeds, staging, the mart, the tests, and `DESIGN.md`. |
+| `test/vocab.js` | Checks the values the dbt tests accept against the vocabulary in `metrics.json`. |
 | `data/` | `orders.csv` and `batch_2.csv`. Once the server has run, also the state: `answers.duckdb`, `answers.csv`, `run_log.csv`. |
 | `skill/SKILL.md` | The instructions the model gets, and nothing else. Keep it the same as the copy in your Claude account. |
 | `eval/CASES.md` | The case set and the decisions taken before the first run. |
@@ -86,6 +92,35 @@ It needs an Anthropic API key in a file called `.env` in this folder (see `.env.
 ### Start again from an empty answer log
 
 Delete `data/answers.duckdb`, `data/answers.csv` and `data/run_log.csv`. The server rebuilds the table from `data/orders.csv` on its next start.
+
+## The tested tables
+
+`data/orders.csv` is the table the metrics read, and it is rebuilt on every push from a raw export through tested tables. A model here is one SQL query that builds one table; a test is a query that must return nothing. dbt runs both in order and stops the build when a test fails. The design, every test and its expected outcome are in `transform/DESIGN.md`.
+
+| Layer | Tables | What it does |
+|---|---|---|
+| Raw | seeds `raw_orders`, `raw_returns`, `branch_codes`, all text | The export as it arrives, two batches marked by `export_batch` |
+| Staging | `stg_orders`, `stg_returns` | Trims, maps, casts, removes repeats, derives the date parts; one row per order and one per returned order |
+| Mart | `fct_orders` | One row per order in the exact columns, types and order of `data/orders.csv`, plus `export_batch` |
+
+The raw export carries five kinds of mess: returns as a separate file of events, some logged twice; branch as a code; order time as a text timestamp; rows the export repeats; category, channel and order value in inconsistent text. There are 37 tests: 7 unit tests on fixed rows and 30 data tests on the export, including three that reconcile rows, order value and returns with the raw files. Then the export from `fct_orders` must equal the two committed CSVs byte for byte.
+
+The raw tables land as dbt seeds so the build needs nothing but the repo. A real project lands raw tables with a loader and reads them as sources.
+
+Rebuild it (needs Python 3.12 and uv):
+
+```
+uv venv --python 3.12 transform/.venv
+uv pip install --python transform/.venv -r transform/requirements.txt
+source transform/.venv/bin/activate
+node scripts/make_raw.js                  # the raw export (already committed)
+cd transform && dbt build && cd ..        # every seed, model and test
+node scripts/export_mart.js               # fct_orders back to transform/target/export/
+cmp data/orders.csv transform/target/export/orders.csv && cmp data/batch_2.csv transform/target/export/batch_2.csv
+node test/vocab.js
+```
+
+**The late returns limit.** A return for a batch 2 order sits in batch 2 only. `scripts/load_batch.js` appends rows and never updates an earlier one, so a late return for a batch 1 order could not be shown. The test `assert_returns_in_order_batch` turns red on one rather than hiding it.
 
 ## Limits
 
