@@ -46,7 +46,7 @@ On every push to any branch, and on dispatch:
 1. **No key:** the harness mock, `npm run check -- --mock`, `npm test` (the key guard, the presets against the code, the build rule, the record's day list) and `npm run build`.
 2. **The twenty-eight cases** through `lib/answer.js` on the smallest model, with the key from the `data-answers-ci` Console workspace (`scripts/ci.js`). Marked by `eval/check.js` against the bar in `harness.json`; every miss is printed by case and line. A pass that misses the bar runs once more as a whole; red only if it misses again.
 3. **On `main`:** the record is committed to `results/ci/`, green or red.
-4. **On `main` and green:** `live` moves to the commit that passed, and Vercel builds it when anything the demo runs changed since its last deployment.
+4. **On `main` and green:** `live` moves to the commit that passed, and the workflow calls the Vercel deploy hook for `live` (secret `VERCEL_DEPLOY_HOOK`; Vercel made no deployment when the workflow first pushed `live`). Vercel builds it when anything the demo runs changed since its last deployment.
 
 A red run moves nothing: visitors keep the last version that passed. A dispatch with `measure` above 0 runs that many passes with no gate (`effort` optional) and records them to `results/ci-measure/`; it never moves `live`. cron-job.org dispatches the gate on `main` every Sunday at 9:41 AM Kuala Lumpur time.
 

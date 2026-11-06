@@ -5,8 +5,9 @@
 #      smallest model, marked by eval/check.js against the bar in harness.json (demo/scripts/ci.js; one
 #      rerun of the whole pass before red).
 #   3. On main only: the record is committed to results/ci/ with the [ci] prefix, green or red.
-#   4. On main and green only: live is moved to the commit that passed. Vercel production tracks live,
-#      so nothing reaches a visitor from a red run or from any other branch.
+#   4. On main and green only: live is moved to the commit that passed, and Vercel is asked to build it
+#      through the deploy hook (Vercel made no deployment when this workflow first pushed live). Vercel
+#      production tracks live, so nothing reaches a visitor from a red run or from any other branch.
 # Measure mode (dispatch with measure above 0): N passes, no gate, the record to results/ci-measure/,
 # live never moves. This workflow never connects to the demo's database.
 # Commits made with the workflow's own token start no new workflow run.
@@ -82,3 +83,11 @@ jobs:
       - name: Move live to the commit that passed
         if: success() && github.ref == 'refs/heads/main' && env.MEASURE == '0'
         run: git push origin "${GITHUB_SHA}:refs/heads/live"
+      - name: Ask Vercel to build live
+        if: success() && github.ref == 'refs/heads/main' && env.MEASURE == '0'
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          [ -n "$HOOK" ] || { echo "::error::No VERCEL_DEPLOY_HOOK secret: live moved, but Vercel was not asked to build it"; exit 1; }
+          curl -fsS -X POST "$HOOK" > /dev/null
+          echo "Vercel asked to build live at ${GITHUB_SHA::7}; the build rule in demo/vercel.json decides whether it builds"

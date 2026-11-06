@@ -37,6 +37,7 @@ Runs on every push to any branch (`paths-ignore: results/**`) and on dispatch. C
 | 2. The 28 cases | `ANTHROPIC_API_KEY`, workspace `data-answers-ci` | `node demo/scripts/ci.js` | The 28 cases through `demo/lib/answer.js` on the smallest model; the two fixed answers sent as a new question would; the batch loaded before S02; marked by `eval/check.js` against the bar in `harness.json`; every miss printed by case and line; one whole rerun before red | the bar not met on the pass and again on the rerun (exit 1); no key, or the workspace limit reached (the calls fail, so red) |
 | 3. Keep the record | the workflow's own token | on `main` only, green or red | record to `results/ci/`, commit `[ci] 28 cases for <sha7>: green` or `red`, `git pull --rebase origin main`, push | a step-2 crash before a record exists (nothing to keep) |
 | 4. Move `live` | the workflow's own token | on `main` and green only | `git push origin "$GITHUB_SHA:refs/heads/live"`: the commit that passed, not the record commit | any red or failed step above; any branch other than `main`; measure mode |
+| 5. Ask Vercel to build `live` | `VERCEL_DEPLOY_HOOK` | on `main` and green only, under step 4's own condition | `curl -fsS -X POST` to the deploy hook for `live`; the build rule in `vercel.json` still decides whether anything builds | no secret, or the hook refused: the run fails with the reason, `live` has moved, and production keeps serving its current deployment until the next call |
 
 **Measure mode.** Dispatch inputs `measure` (passes, default `0`) and `effort` (blank, `low`, `medium`, `high`, `xhigh`, `max`). With `measure` above 0: N passes, no gate, no rerun, a per-case tally (`A01 5 of 5 matched` and so on) and the count of passes that met the bar; the record goes to `results/ci-measure/` on `main`; step 4 never runs. `effort` without `measure` is refused. A mock pass is never recorded.
 
@@ -95,7 +96,9 @@ The path list is the one the file has today, unchanged.
    3. Megat moves production from `demo` to `live`, then promotes that `live` deployment to production in Vercel. If Vercel rebuilds it on promotion with the production settings, that build is the one checked.
    4. Check by effect, as in A3.
 
-   **Taken: Order B.** On 6 Nov 2026 Vercel refused `live` with the message: Branch "live" not found in the connected Git repository; production stays on `demo` until the first green run creates `live`.
+   **Taken: Order B.** On 6 Nov 2026 Vercel refused `live` with the message: Branch "live" not found in the connected Git repository; production stayed on `demo` until the first green run created `live`.
+
+   **What happened.** Run 42215955939 on `8d90b30` went green (20 of 20, 6 of 6, state 2 of 2, US$0.0401, no rerun), committed its record and created `live`. Vercel made no deployment for `live` at all, not even a cancelled one. Vercel's docs do not say why; the likely causes are the pusher (the workflow's own token) or a commit Vercel had already received on `main`, where deployments are off. Megat moved production to `live` (it saved once the branch existed) and created a deployment of `live` from the dashboard. It built `8d90b30` as production; checked by effect the same day: Vercel's status on the commit, `/api/stats`, the name mark and the Back link, the first preset's full block. Step 5 of the workflow (section 2), the deploy hook, makes every later green run reach Vercel without a hand.
 
    In either order, if the run is red, `live` does not exist or does not move, production is untouched, and the misses are reported by case and line.
 5. **The push to `main` is never forced.** If `git push origin gate:main` is rejected because `origin/main` moved (a `[ci]` or daily record commit, say), Claude Code fetches, merges the new `origin/main` into `gate` (no rebase, no force), reruns every offline test in section 6, shows the results, and asks Megat before pushing again.
@@ -113,7 +116,8 @@ Each is Megat's to create or change. Each is checked by its effect (a run starts
 | `data-answers-actions` | fine-grained token: Actions read and write on `mjazzly/data-answers` only | cron-job.org only, in the two jobs' Authorization header | Megat | 90 days from creation |
 | `DEMO_URL` | `https://data-answers.vercel.app` | GitHub repository variable, exists | unchanged | never |
 | Production branch | `demo` to `live` | Vercel, project `data-answers`, Settings, Environments, Production, Branch Tracking | Megat | never |
-| System environment variables | "Enable access to System Environment Variables" | Vercel project settings | Megat looks; not changed | never |
+| System environment variables | "Enable access to System Environment Variables" | Vercel project settings | Megat looks; ticked; not changed | never |
+| `VERCEL_DEPLOY_HOOK` | the URL of a Vercel deploy hook for branch `live`; anyone holding it can start a build, so it is kept as a secret | made in Vercel, project `data-answers`, Settings, Git, Deploy Hooks; kept in GitHub as a repository secret | Megat | never; delete the hook in Vercel to revoke it |
 | The workflow's own token | `contents: write`, given per run | GitHub, built in | none | each run |
 
 The demo's own Vercel settings (its key, `IP_SALT`, the caps, Upstash) are unchanged. CI never connects to Upstash: no `UPSTASH_*` or `KV_*` variable is set in either workflow, and test 1 checks that.
@@ -150,7 +154,7 @@ A refused key inside `claim()` throws before any model call, so the route answer
 
 Then a self-check: one copy of P02 with its value changed by 0.01 must be reported stale, by preset and field. Expected: 8 of 8 match, the planted copy reported, exit 0. A metric change that would leave a preset stale turns the run red.
 
-**Test 3, `demo/test/vercel.js`, the build rule.** Reads `demo/vercel.json` and runs its `ignoreCommand` in a throwaway git repository with set variables.
+**Test 3, `demo/test/vercel.js`, the build rule.** Reads `demo/vercel.json` and runs its `ignoreCommand` in a throwaway git repository with set variables; then reads `cases.yml` for the deploy hook.
 
 | Case | Expected exit |
 |---|---|
@@ -161,6 +165,10 @@ Then a self-check: one copy of P02 with its value changed by 0.01 must be report
 | branch `live`, previous SHA not in the clone | 1, builds |
 | branch `live`, only `results/` changed since the previous SHA | 0, skipped |
 | branch `live`, a `demo/` change two commits back and only `results/` in the last commit | 1, builds (the case `HEAD^` got wrong) |
+| branch `live`, a change in `../lib` | 1, builds |
+| `cases.yml`: the step "Ask Vercel to build live" | directly after "Move live to the commit that passed" |
+| `cases.yml`: that step's condition | the same as the move's, `success() && github.ref == 'refs/heads/main' && env.MEASURE == '0'` (a planted `always()` fails it) |
+| `cases.yml`: the hook | from `secrets.VERCEL_DEPLOY_HOOK` only; no hook URL written in the file |
 
 **Test 4, `demo/test/record.js`, the catch-up day list.** `missing-days.js` with a folder of record files and a set "today".
 
