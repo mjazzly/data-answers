@@ -63,6 +63,15 @@ Exit 0 on green, green after rerun included (and always in measure mode), 1 on r
 
 **Weekly rerun.** cron-job.org calls the `cases` dispatch endpoint for `main` every Sunday at 9:41 AM Kuala Lumpur time (01:41 UTC Sunday); the scorecard's run is at 9:17 AM. A second job dispatches `demo record` daily at 8:23 AM (00:23 UTC), behind GitHub's own schedule. One fine-grained token serves both.
 
+Set up on 6 Nov 2026, both in the job's own time zone, Asia/Kuala_Lumpur, each a `POST` with `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2022-11-28`, `Content-Type: application/json`, `Authorization: Bearer <token>` and the body `{"ref":"main"}`:
+
+| cron-job.org job | URL | Crontab | Test |
+|---|---|---|---|
+| `data-answers cases weekly` | `.../repos/mjazzly/data-answers/actions/workflows/cases.yml/dispatches` | `41 9 * * 0` | 204; run 42230004485 on `f8e5f25`: green, 20 of 20, 6 of 6, state 2 of 2, US$0.0408; record `200f8c5`; `live` moved `2580834..f8e5f25`; both Vercel deployments "Canceled by Ignored Build Step" (only `results/` changed), as the build rule intends |
+| `data-answers demo record daily` | `.../repos/mjazzly/data-answers/actions/workflows/demo-record.yml/dispatches` | `23 8 * * *` | 204; runs 42230516440 and 42230722595 succeeded |
+
+The token was regenerated the same day, after part of it showed in a screenshot shared in the session; both jobs carry the new one, and the `demo record` test with it returned 204 (run 42231309009). The `cases` job has the new token too and is first exercised by its Sunday run. GitHub's response marks API version `2022-11-28` as deprecated, with its sunset on 10 Mar 2028; the header needs changing before then.
+
 ## 3. Vercel, `demo/vercel.json`
 
 ```json
@@ -116,8 +125,8 @@ Each is Megat's to create or change. Each is checked by its effect (a run starts
 
 | Name | What it is | Where it lives | Created by | Expires |
 |---|---|---|---|---|
-| `ANTHROPIC_API_KEY` | key `github-actions` in Console workspace `data-answers-ci`, US$5 monthly limit | GitHub, `mjazzly/data-answers`, Settings, Secrets and variables, Actions, repository secret | Megat | 90 days from creation (about 5 Feb 2027 if made on 7 Nov). After that CI goes red and `live` stops moving; production keeps serving |
-| `data-answers-actions` | fine-grained token: Actions read and write on `mjazzly/data-answers` only | cron-job.org only, in the two jobs' Authorization header | Megat | 90 days from creation |
+| `ANTHROPIC_API_KEY` | key `github-actions` in Console workspace `data-answers-ci`, US$5 monthly limit | GitHub, `mjazzly/data-answers`, Settings, Secrets and variables, Actions, repository secret | Megat | 90 days from creation, about 4 Feb 2027 (made 6 Nov 2026). After that CI goes red and `live` stops moving; production keeps serving |
+| `data-answers-actions` | fine-grained token: Actions read and write on `mjazzly/data-answers` only | cron-job.org only, in the two jobs' Authorization header | Megat | 90 days from creation, about 4 Feb 2027 (regenerated 6 Nov 2026). After that both schedules get 401 and stop; pushes still run the gate |
 | `DEMO_URL` | `https://data-answers.vercel.app` | GitHub repository variable, exists | unchanged | never |
 | Production branch | `demo` to `live` | Vercel, project `data-answers`, Settings, Environments, Production, Branch Tracking | Megat | never |
 | System environment variables | "Enable access to System Environment Variables" | Vercel project settings | Megat looks; ticked; not changed | never |
