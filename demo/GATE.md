@@ -205,13 +205,22 @@ Then a self-check: one copy of P02 with its value changed by 0.01 must be report
 | the issue step's title and repeat guard | names the commit and the misses; skipped when an issue with that title exists |
 | the issue step's place | last in the job |
 
+**Test 6, `demo/test/page.js`, the tier on the page.** The page says "smallest model" where it named the model (demo 1.2.1); the records, `presets.json`'s own `model` field and `/api/stats` keep the name.
+
+| Case | Expected |
+|---|---|
+| `Demo.js`, `page.js`, `layout.js`, `sprite.js`, comments left out | no `claude`, `haiku`, `opus`, `sonnet` or `fable` |
+| any `{... .model}` rendered | none (a planted `{result.model}` fails it) |
+| the answer line | `Recorded answer, run ..., smallest model, <date>` and `Answered now, run ..., smallest model, US$...` |
+| `presets.json` | its `model` field names the model; nothing else in it does |
+
 **The scripts, run offline.**
 
 | Command | Expected |
 |---|---|
 | root `npm run mock` | bar met, as today |
 | `demo/` `npm run check -- --mock` | 20 of 20, 6 of 6, state 2 of 2, BAR MET, exit 0, as today |
-| `demo/` `npm test` | tests 1 to 5 pass, exit 0 |
+| `demo/` `npm test` | tests 1 to 6 pass, exit 0 |
 | `demo/` `next build` | completes |
 | `ci.js --mock` | one pass, GREEN, exit 0, no record written |
 | `ci.js --mock --plant A03` | A03 missed with its lines, 19 of 20, bar met, GREEN, exit 0: the bar allows two answered misses. (This row was "RED" before the build; the run corrected it.) |

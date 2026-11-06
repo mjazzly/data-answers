@@ -68,7 +68,7 @@ function Answer({ it }) {
 export default function Demo({ presets }) {
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState(null);   // { question, items, source: "preset" | "live", run_id, model, when }
+  const [result, setResult] = useState(null);   // { question, items, source: "preset" | "live", run_id, when }; the page names the tier, never the model
   const [notice, setNotice] = useState(null);
   const [stats, setStats] = useState(null);
   const box = useRef(null);
@@ -80,7 +80,7 @@ export default function Demo({ presets }) {
 
   function pick(p) {
     setQ(p.question); setNotice(null);
-    setResult({ question: p.question, items: p.items, source: "preset", run_id: p.run_id, model: presets.model, when: presets.recorded_at });
+    setResult({ question: p.question, items: p.items, source: "preset", run_id: p.run_id, when: presets.recorded_at });
     show();
   }
 
@@ -95,7 +95,7 @@ export default function Demo({ presets }) {
       const j = await r.json().catch(() => ({ ok: false, why: "error" }));
       if (j.stats) setStats(j.stats);
       if (!j.ok) { setNotice(j.why || "error"); return; }
-      setResult({ question, items: j.items, source: "live", run_id: j.run_id, model: j.model, cost: j.cost_usd });
+      setResult({ question, items: j.items, source: "live", run_id: j.run_id, cost: j.cost_usd });
       if (j.items.some((it) => it.kind === "stop")) setQ(question); else setQ("");
       show();
     } catch { setNotice("error"); }
@@ -138,8 +138,8 @@ export default function Demo({ presets }) {
             <p className="asked"><span className="mono">Asked</span>{result.question}</p>
             <p className="out-run"><svg className="ic" aria-hidden="true"><use href="#ic-circle-check" /></svg>
               <span>{result.source === "preset"
-                ? <>Recorded answer, run <b>{result.run_id}</b>, {result.model}, {fmtDate(result.when)}</>
-                : <>Answered now, run <b>{result.run_id}</b>, {result.model}, US${result.cost.toFixed(4)}</>}</span></p>
+                ? <>Recorded answer, run <b>{result.run_id}</b>, smallest model, {fmtDate(result.when)}</>
+                : <>Answered now, run <b>{result.run_id}</b>, smallest model, US${result.cost.toFixed(4)}</>}</span></p>
             <div className="answers">{result.items.map((it, i) => <Answer key={i} it={it} />)}</div>
           </>
         )}

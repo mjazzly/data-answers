@@ -1,6 +1,6 @@
 {
   "name": "data-answers-demo",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
     "presets": "node scripts/copy-core.js && node scripts/record-presets.js",
     "check": "node scripts/copy-core.js && node scripts/check-demo.js",
     "pretest": "node scripts/copy-core.js",
-    "test": "node test/keys.js && node test/presets.js && node test/vercel.js && node test/record.js && node test/rerun.js",
+    "test": "node test/keys.js && node test/presets.js && node test/vercel.js && node test/record.js && node test/rerun.js && node test/page.js",
     "ci": "node scripts/ci.js"
   },
   "engines": {
