@@ -21,3 +21,6 @@ eval/runs-demo/
 
 # the gate brief stays local
 GATE-BRIEF.md
+
+# local Claude Code settings and launch configs, at any depth
+.claude/
