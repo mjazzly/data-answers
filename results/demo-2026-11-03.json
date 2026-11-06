@@ -1,0 +1,19 @@
+{
+  "day": "2026-11-03",
+  "questions": 0,
+  "daily_cap": 150,
+  "ip_cap": 10,
+  "cost_day_usd": 0,
+  "month": "2026-11",
+  "cost_month_usd": 0.004404,
+  "month_questions": 3,
+  "blocked": {
+    "bot": 0,
+    "ip_cap": 0,
+    "daily_cap": 0,
+    "budget": 0
+  },
+  "free_text": "on",
+  "model": "claude-haiku-5-5",
+  "written_at": "2026-11-06T14:03:25Z"
+}
