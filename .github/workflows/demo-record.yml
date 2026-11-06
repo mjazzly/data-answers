@@ -2,7 +2,10 @@
 # /api/stats, and the job writes with the repository's own token.
 #   Hourly: if this month's counted spend has crossed 50% or 75% of the workspace limit (the app
 #           closes free text at 75%), open one issue for that line. GitHub emails the owner.
-#   Daily, 8:10 AM Kuala Lumpur time (00:10 UTC): write the UTC day that just ended to results/.
+#   Every run: write each finished UTC day that has no record yet to results/, from the demo's first day
+#           and never more than 35 days back (demo/scripts/missing-days.js). The counters live 40 days,
+#           so a run that was late or skipped is caught up by the next one. A daily dispatch from
+#           cron-job.org at 8:23 AM Kuala Lumpur time (00:23 UTC) stands behind GitHub's own schedule.
 name: demo record
 on:
   schedule:
@@ -37,14 +40,20 @@ jobs:
               fi
             fi
           done
-      - name: Daily record
+      - name: Daily record, catching up
         run: |
-          [ "$(date -u +%H)" = "00" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ] || exit 0
-          day=$(date -u -d yesterday +%F)
-          [ "${{ github.event_name }}" = "workflow_dispatch" ] && day=$(date -u +%F)
-          f="results/demo-$day.json"
-          curl -fsS "$DEMO_URL/api/stats?day=$day" | jq --arg at "$(date -u +%FT%TZ)" '{day, questions, daily_cap, ip_cap, cost_day_usd, month, cost_month_usd, month_questions, blocked, free_text, model, written_at: $at}' > "$f"
+          days=$(node demo/scripts/missing-days.js results)
+          [ -n "$days" ] || exit 0
+          for day in $days; do
+            curl -fsS "$DEMO_URL/api/stats?day=$day" | jq --arg at "$(date -u +%FT%TZ)" '{day, questions, daily_cap, ip_cap, cost_day_usd, month, cost_month_usd, month_questions, blocked, free_text, model, written_at: $at}' > "$RUNNER_TEMP/day.json"
+            mv "$RUNNER_TEMP/day.json" "results/demo-$day.json"
+          done
+          set -- $days
+          [ $# -eq 1 ] && msg="Record the demo's day $1: questions and cost" || msg="Record the demo's missing days, $1 to ${!#}: questions and cost"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$f"
-          git diff --cached --quiet || { git commit -m "Record the demo's day $day: questions and cost"; git push; }
+          git add results
+          git diff --cached --quiet && exit 0
+          git commit -m "$msg"
+          git pull --rebase origin main
+          git push origin HEAD:main
