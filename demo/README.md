@@ -43,16 +43,17 @@ Vercel production deploys from the `live` branch, and nothing else builds (`verc
 
 On every push to any branch, and on dispatch:
 
-1. **No key:** the harness mock, `npm run check -- --mock`, `npm test` (the key guard, the presets against the code, the build rule, the record's day list) and `npm run build`.
+1. **No key:** the harness mock, `npm run check -- --mock`, `npm test` (the key guard, the presets against the code, the build rule, the record's day list, the rerun's word) and `npm run build`.
 2. **The twenty-eight cases** through `lib/answer.js` on the smallest model, with the key from the `data-answers-ci` Console workspace (`scripts/ci.js`). Marked by `eval/check.js` against the bar in `harness.json`; every miss is printed by case and line. A pass that misses the bar runs once more as a whole; red only if it misses again.
 3. **On `main`:** the record is committed to `results/ci/`, green or red.
 4. **On `main` and green:** `live` moves to the commit that passed, and the workflow calls the Vercel deploy hook for `live` (secret `VERCEL_DEPLOY_HOOK`; Vercel made no deployment when the workflow first pushed `live`). Vercel builds it when anything the demo runs changed since its last deployment.
 
-A red run moves nothing: visitors keep the last version that passed. A dispatch with `measure` above 0 runs that many passes with no gate (`effort` optional) and records them to `results/ci-measure/`; it never moves `live`. cron-job.org dispatches the gate on `main` every Sunday at 9:41 AM Kuala Lumpur time.
+A red run moves nothing: visitors keep the last version that passed. A run that meets the bar only on the rerun is "green after rerun": `live` moves, the record says so with the cases pass 1 missed, and the workflow opens one GitHub issue naming them. A dispatch with `measure` above 0 runs that many passes with no gate (`effort` optional) and records them to `results/ci-measure/`; it never moves `live`. cron-job.org dispatches the gate on `main` every Sunday at 9:41 AM Kuala Lumpur time.
 
 ```
 node scripts/ci.js --mock                 # the gate's path with the scripted stand-in; no key, nothing recorded
 node scripts/ci.js --mock --plant A01,A02,A03   # three cases made to miss: shows red (one alone stays green; the bar allows two)
+node scripts/ci.js --mock --plant-first A01,A02,A03   # the same misses in pass 1 only: shows green after rerun
 ANTHROPIC_API_KEY=... node scripts/ci.js  # the gate on the smallest model (data-answers-ci key; about US$0.04 a pass)
 ```
 

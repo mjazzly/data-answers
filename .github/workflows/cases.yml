@@ -4,7 +4,10 @@
 #   2. With the data-answers-ci workspace key: the twenty-eight cases through the demo's own path on the
 #      smallest model, marked by eval/check.js against the bar in harness.json (demo/scripts/ci.js; one
 #      rerun of the whole pass before red).
-#   3. On main only: the record is committed to results/ci/ with the [ci] prefix, green or red.
+#   3. On main only: the record is committed to results/ci/ with the [ci] prefix, green or red. A run
+#      that met the bar only on the rerun is "green after rerun": it still moves live, and the workflow
+#      opens one issue naming the cases pass 1 missed (GitHub emails the owner), as demo record does
+#      for the spend lines.
 #   4. On main and green only: live is moved to the commit that passed, and Vercel is asked to build it
 #      through the deploy hook (Vercel made no deployment when this workflow first pushed live). Vercel
 #      production tracks live, so nothing reaches a visitor from a red run or from any other branch.
@@ -26,6 +29,7 @@ on:
         default: ""
 permissions:
   contents: write
+  issues: write
 concurrency:
   group: cases-${{ github.ref }}
   cancel-in-progress: false
@@ -76,7 +80,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add results
           if [ "$MEASURE" != "0" ]; then msg="[ci] measure, $MEASURE passes for ${GITHUB_SHA::7}, effort ${EFFORT:-unset}"
-          else msg="[ci] 28 cases for ${GITHUB_SHA::7}: ${{ steps.cases.outcome == 'success' && 'green' || 'red' }}"; fi
+          else msg="[ci] 28 cases for ${GITHUB_SHA::7}: ${{ steps.cases.outputs.status || (steps.cases.outcome == 'success' && 'green' || 'red') }}"; fi
           git commit -m "$msg"
           git pull --rebase origin main
           git push origin HEAD:main
@@ -91,3 +95,17 @@ jobs:
           [ -n "$HOOK" ] || { echo "::error::No VERCEL_DEPLOY_HOOK secret: live moved, but Vercel was not asked to build it"; exit 1; }
           curl -fsS -X POST "$HOOK" > /dev/null
           echo "Vercel asked to build live at ${GITHUB_SHA::7}; the build rule in demo/vercel.json decides whether it builds"
+      - name: Open an issue for a green after rerun
+        if: always() && github.ref == 'refs/heads/main' && env.MEASURE == '0' && steps.cases.outcome == 'success' && steps.cases.outputs.status == 'green after rerun'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MISSES: ${{ steps.cases.outputs.pass1_misses }}
+          LIST: ${{ steps.cases.outputs.pass1_list }}
+        run: |
+          title="Gate green only after rerun on ${GITHUB_SHA::7}: pass 1 missed $MISSES"
+          if [ -z "$(gh issue list --state all --search "\"$title\" in:title" --json number -q '.[0].number')" ]; then
+            gh issue create --title "$title" --body "$(printf '%s\n\n%s\n\n%s\n' \
+              "The twenty-eight cases met the bar on ${GITHUB_SHA::7} only when the whole pass ran a second time, so it gated as green and live moved to it. Pass 1 missed these, each with its first failing line:" \
+              "$LIST" \
+              "Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID. Record: results/ci/, the file for ${GITHUB_SHA::7} (status and pass1_misses, with every line in passes[0]). A case that misses only sometimes is a change worth reading before the next push. @mjazzly")"
+          fi

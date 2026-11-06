@@ -13,7 +13,7 @@
     "presets": "node scripts/copy-core.js && node scripts/record-presets.js",
     "check": "node scripts/copy-core.js && node scripts/check-demo.js",
     "pretest": "node scripts/copy-core.js",
-    "test": "node test/keys.js && node test/presets.js && node test/vercel.js && node test/record.js",
+    "test": "node test/keys.js && node test/presets.js && node test/vercel.js && node test/record.js && node test/rerun.js",
     "ci": "node scripts/ci.js"
   },
   "engines": {

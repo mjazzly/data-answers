@@ -9,13 +9,16 @@
 //   node demo/scripts/ci.js --mock --plant A01,A02,A03
 //                                                   (the stand-in with these cases made to miss, to show red offline;
 //                                                   one answered miss alone stays green, as the bar allows two)
+//   node demo/scripts/ci.js --mock --plant-first A01,A02,A03
+//                                                   (the same misses in pass 1 only: shows green after rerun offline)
 //
 // Each pass runs lib/answer.js, its call and token limits and the smallest model, on a fresh copy of the
 // table; sends the two fixed answers as a new question would; loads the batch before S02; and is marked
 // by eval/check.js against the bar in harness.json, with every miss printed by case and line. The cases
 // share state through the batch, so one cannot be rerun alone: a pass that misses the bar runs once more
-// as a whole, and the run is red only if that pass misses too. Exit 0 on green (and always when
-// measuring), 1 on red, 2 on a form that is refused. Unlike check-demo.js it never reads ../.env: the key
+// as a whole, and the run is red only if that pass misses too. A run that passes only on the rerun is
+// "green after rerun": it still gates as green, and the record and the workflow's issue name the cases
+// pass 1 missed. Exit 0 on green (and always when measuring), 1 on red, 2 on a form that is refused. Unlike check-demo.js it never reads ../.env: the key
 // must come from the environment, so it can never spend the demo's own.
 import fs from "node:fs";
 import os from "node:os";
@@ -31,11 +34,13 @@ const MOCK = argv.includes("--mock");
 const MEASURE = arg("measure") == null ? 0 : Number(arg("measure"));
 const EFFORT = arg("effort") || null;
 const PLANT = arg("plant") ? arg("plant").split(",") : [];
+const PLANT_FIRST = arg("plant-first") ? arg("plant-first").split(",") : [];
 const recordDir = arg("record") ? path.resolve(arg("record")) : null;   // resolved before the chdir below
 const refuse = (why) => { console.error(why); process.exit(2); };
 if (!Number.isInteger(MEASURE) || MEASURE < 0) refuse("--measure takes a whole number of passes");
 if (MOCK && recordDir) refuse("a mock pass is never recorded");
 if (PLANT.length && !MOCK) refuse("--plant is for --mock only");
+if (PLANT_FIRST.length && (!MOCK || MEASURE)) refuse("--plant-first is for a --mock gate only");
 if (EFFORT && !MEASURE) refuse("--effort is for --measure only; the gate runs the service's own settings");
 if (EFFORT && !["low", "medium", "high", "xhigh", "max"].includes(EFFORT)) refuse("--effort must be low, medium, high, xhigh or max");
 if (!MOCK && !process.env.ANTHROPIC_API_KEY) refuse("No ANTHROPIC_API_KEY (the data-answers-ci workspace key). Use --mock to run without one.");
@@ -49,7 +54,7 @@ const harness = JSON.parse(fs.readFileSync(path.join(REPO, "harness.json"), "utf
 const expected = loadExpected(path.join(REPO, "eval", "expected"));
 const fixed = Object.fromEntries(fs.readFileSync(path.join(REPO, "eval", "answers.txt"), "utf8").split("\n").filter((l) => l.includes("=")).map((l) => [l.slice(0, l.indexOf("=")).trim(), l.slice(l.indexOf("=") + 1).trim()]));
 const version = JSON.parse(fs.readFileSync(path.join(DEMO, "package.json"), "utf8")).version;
-for (const id of PLANT) if (!expected.cases.some((c) => c.id === id)) refuse(`--plant takes case ids, such as A01,A02,A03; ${id} is not one`);
+for (const id of [...PLANT, ...PLANT_FIRST]) if (!expected.cases.some((c) => c.id === id)) refuse(`--plant takes case ids, such as A01,A02,A03; ${id} is not one`);
 
 async function model() {
   if (MOCK) { const { MockModel } = await import("../lib/mock-model.js"); return { fresh: () => new MockModel() }; }
@@ -71,15 +76,16 @@ async function pass(label, m, work) {
   fs.mkdirSync(dir, { recursive: true });
   fs.copyFileSync(path.join(REPO, "data", "orders.csv"), path.join(dir, "orders.csv"));
   const runId = newRunId();
+  const plant = label === "gate-1" ? [...PLANT, ...PLANT_FIRST] : PLANT;
   const tokens = { input: 0, output: 0, cache_read: 0, cache_write: 0 };
   let cost = 0, calls = 0, maxed = 0;
   for (const c of expected.cases) {
     if (c.load) { const s = await Store.open(dir, runId); const r = await s.loadBatch(path.join(REPO, "data", c.load)); await s.close(); console.log(`    (batch loaded: ${r.rows_added} rows, data version ${r.data_version})`); }
-    const fresh = PLANT.includes(c.id) ? planted(m.fresh()) : m.fresh();
+    const fresh = plant.includes(c.id) ? planted(m.fresh()) : m.fresh();
     const a = await answer({ question: c.question, model: fresh, runId, questionId: c.id, dataDir: dir, followUp: fixed[c.id], effort: EFFORT || undefined });
     for (const k of Object.keys(tokens)) tokens[k] += a.tokens[k];
     cost += a.cost_usd; calls += a.calls; if (a.stopped) maxed++;
-    console.log(`    ${c.id}  ${a.calls} calls${a.stopped ? " (" + a.stopped + ")" : ""}${PLANT.includes(c.id) ? " (planted miss)" : ""}`);
+    console.log(`    ${c.id}  ${a.calls} calls${a.stopped ? " (" + a.stopped + ")" : ""}${plant.includes(c.id) ? " (planted miss)" : ""}`);
   }
   const cases = checkAll(expected, loadRun(dir));
   for (const c of Object.values(cases)) if (!c.match) console.log(`  MISS ${c.name}\n          ${c.fails.join("\n          ")}`);
@@ -93,7 +99,7 @@ const work = fs.mkdtempSync(path.join(os.tmpdir(), "da-ci-"));
 const startedAt = new Date().toISOString();
 const m = await model();
 const who = MOCK ? "scripted stand-in (mock)" : `model ${MODEL}, effort ${EFFORT ? `${EFFORT} (measure override)` : "unset (the service's)"}`;
-console.log(`demo CI path ${version}: ${who}; ${LIMITS.maxCalls} calls and ${LIMITS.maxTokens} output tokens a question${PLANT.length ? `; planted misses in ${PLANT.join(" ")}` : ""}`);
+console.log(`demo CI path ${version}: ${who}; ${LIMITS.maxCalls} calls and ${LIMITS.maxTokens} output tokens a question${PLANT.length ? `; planted misses in ${PLANT.join(" ")}` : ""}${PLANT_FIRST.length ? `; planted misses in pass 1 only in ${PLANT_FIRST.join(" ")}` : ""}`);
 const passes = [];
 let green = null;
 try {
@@ -114,7 +120,16 @@ try {
   }
 } finally { fs.rmSync(work, { recursive: true, force: true }); }
 const total = (k) => passes.reduce((a, p) => a + p[k], 0);
-console.log(`\n${MEASURE ? "MEASURED" : green ? "GREEN" : "RED"}: ${passes.length} pass${passes.length > 1 ? "es" : ""}; model calls ${total("model_calls")}; cost US$${total("cost_usd").toFixed(4)}`);
+// The gate's word for the run, and the cases pass 1 missed when it missed the bar (green after rerun or red)
+const status = MEASURE ? "measured" : green ? (passes.length > 1 ? "green after rerun" : "green") : "red";
+const pass1Misses = MEASURE || passes[0].verdict.passed ? [] : Object.values(passes[0].cases).filter((c) => !c.match);
+console.log(`\n${status.toUpperCase()}: ${passes.length} pass${passes.length > 1 ? "es" : ""}; model calls ${total("model_calls")}; cost US$${total("cost_usd").toFixed(4)}`);
+if (pass1Misses.length) console.log(`pass 1 missed: ${pass1Misses.map((c) => c.name.split(".")[0]).join(" ")}`);
+if (process.env.GITHUB_OUTPUT && !MEASURE) {
+  const end = `END_${Date.now()}`;
+  fs.appendFileSync(process.env.GITHUB_OUTPUT, `status=${status}\npass1_misses=${pass1Misses.map((c) => c.name.split(".")[0]).join(" ")}\n`
+    + `pass1_list<<${end}\n${pass1Misses.map((c) => `- ${c.name} (${c.fails[0].replace(/^\S+: /, "")})`).join("\n")}\n${end}\n`);
+}
 
 if (recordDir) {
   const sha = (process.env.GITHUB_SHA || "local").slice(0, 7);
@@ -122,7 +137,7 @@ if (recordDir) {
   const record = { label, started_at: startedAt, commit: process.env.GITHUB_SHA || null, ref: process.env.GITHUB_REF || null,
     workflow_run: process.env.GITHUB_RUN_ID ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}` : null,
     trigger: process.env.GITHUB_EVENT_NAME || "local", mode: MEASURE ? "measure" : "gate", demo_version: version, model: MODEL, effort: EFFORT,
-    limits: LIMITS, bar: harness.bar, green, model_calls: total("model_calls"), cost_usd: Number(total("cost_usd").toFixed(6)), passes };
+    limits: LIMITS, bar: harness.bar, green, status, pass1_misses: pass1Misses.map((c) => c.name.split(".")[0]), model_calls: total("model_calls"), cost_usd: Number(total("cost_usd").toFixed(6)), passes };
   fs.mkdirSync(recordDir, { recursive: true });
   fs.writeFileSync(path.join(recordDir, `${label}.json`), JSON.stringify(record, null, 2) + "\n");
   console.log(`record written: ${path.relative(REPO, path.join(recordDir, `${label}.json`))}`);
