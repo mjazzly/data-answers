@@ -55,9 +55,11 @@ const FIXED = {
   value_not_in_data: "That value is not in the data.",
 };
 
-// dataDir and followUp are for scripts/check-demo.js only, which runs the twenty-eight cases through this
-// same function on one data folder, as the harness does. The route passes neither.
-export async function answer({ question, model, runId = newRunId(), questionId = "Q01", dataDir, followUp }) {
+// dataDir and followUp are for scripts/check-demo.js and scripts/ci.js only, which run the twenty-eight
+// cases through this same function on one data folder, as the harness does. effort is for
+// scripts/ci.js --measure only, to compare effort levels; unset, the request is the service's own. The
+// route passes none of the three.
+export async function answer({ question, model, runId = newRunId(), questionId = "Q01", dataDir, followUp, effort }) {
   const m = await load();
   const dir = dataDir || fs.mkdtempSync(path.join(os.tmpdir(), "da-"));
   if (!fs.existsSync(path.join(dir, "orders.csv"))) fs.copyFileSync(path.join(m.core, "data", "orders.csv"), path.join(dir, "orders.csv"));
@@ -80,7 +82,9 @@ export async function answer({ question, model, runId = newRunId(), questionId =
       while (true) {
         if (n >= LIMITS.maxCalls) { stopped = "max_calls"; return; }
         n++; calls++;
-        const res = await model.create({ model: MODEL, max_tokens: LIMITS.maxTokens, system: m.skill, tools, messages, cache_control: { type: "ephemeral" } });
+        const req = { model: MODEL, max_tokens: LIMITS.maxTokens, system: m.skill, tools, messages, cache_control: { type: "ephemeral" } };
+        if (effort) req.output_config = { effort };
+        const res = await model.create(req);
         const u = res.usage || {};
         tokens.input += u.input_tokens || 0; tokens.output += u.output_tokens || 0;
         tokens.cache_read += u.cache_read_input_tokens || 0; tokens.cache_write += u.cache_creation_input_tokens || 0;
