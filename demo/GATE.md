@@ -211,6 +211,15 @@ One gate pass on the demo path cost US$0.0407 on 31 Oct (run `D202610312308-4aad
 | Measure, high effort | 5 | more output tokens; estimated US$0.30 to 0.40, read from its record |
 | The red check | 2 | US$0.08 |
 
+**Measured on 6 Nov 2026, on `1631ab3`** (step 5 of the brief):
+
+| Effort | Run | Passes meeting the bar | Every case | Model calls | Cost | Record |
+|---|---|---|---|---|---|---|
+| unset (the service's) | 42221871022 | 5 of 5 | 5 of 5 each | 428 | US$0.1330 (first pass US$0.0397 writing the cache, then about US$0.023) | `results/ci-measure/M202611061300-1631ab3.json` |
+| high | 42221887336 | 5 of 5 | 5 of 5 each | 432 | US$0.1258 (about US$0.025 a pass) | `results/ci-measure/M202611061309-1631ab3-high.json` |
+
+Kept: **effort unset**, the lowest that met the bar in five of five. `answer()` and the route stay as they are; the gate keeps running the service's own settings. `live` did not move on either run.
+
 All inside the workspace's US$5 a month. If the limit is reached, the calls fail, the run is red and nothing goes live.
 
 ## 8. What this build does not touch
