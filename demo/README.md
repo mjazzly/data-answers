@@ -8,7 +8,7 @@ One page on Vercel where a visitor asks a question about the synthetic orders ta
 
 In order, in `lib/limits.js` and `app/api/ask/route.js`, before any call:
 
-1. **Kill switch.** Upstash console, CLI tab: `SET da:free_text off` closes free text at once; `DEL da:free_text` opens it. The `FREE_TEXT=off` setting in Vercel does the same but needs a redeploy.
+1. **Kill switch.** Upstash console, CLI tab: `SET da:free_text off` closes free text at once; `DEL da:free_text` opens it. The `FREE_TEXT=off` setting in Vercel does the same but needs a redeploy. **Never run `FLUSHDB` or `FLUSHALL` in the Upstash console: the database is shared.** Another build keeps its state in it under its own prefix. The app itself touches only `da:` keys: `store()` in `lib/limits.js` throws on any other key, and offers no command that lists or flushes keys (`test/keys.js`).
 2. **200 characters** at most.
 3. **Vercel BotID** (Basic) on the free-text route.
 4. **Per-connection cap**, 10 a day (`IP_CAP`). Addresses are kept only as a salted hash.
@@ -37,9 +37,28 @@ Per question (`lib/answer.js`): the smallest model only, fixed in code; at most 
 
 Project root directory: `demo`.
 
+## The gate: production tracks `live`
+
+Vercel production deploys from the `live` branch, and nothing else builds (`vercel.json`). Only the `cases` workflow (`.github/workflows/cases.yml`) moves `live`, only from `main`, and only after the twenty-eight cases passed. Nobody pushes `live` by hand. The design and the reasons are in `GATE.md`.
+
+On every push to any branch, and on dispatch:
+
+1. **No key:** the harness mock, `npm run check -- --mock`, `npm test` (the key guard, the presets against the code, the build rule, the record's day list) and `npm run build`.
+2. **The twenty-eight cases** through `lib/answer.js` on the smallest model, with the key from the `data-answers-ci` Console workspace (`scripts/ci.js`). Marked by `eval/check.js` against the bar in `harness.json`; every miss is printed by case and line. A pass that misses the bar runs once more as a whole; red only if it misses again.
+3. **On `main`:** the record is committed to `results/ci/`, green or red.
+4. **On `main` and green:** `live` moves to the commit that passed, and Vercel builds it when anything the demo runs changed since its last deployment.
+
+A red run moves nothing: visitors keep the last version that passed. A dispatch with `measure` above 0 runs that many passes with no gate (`effort` optional) and records them to `results/ci-measure/`; it never moves `live`. cron-job.org dispatches the gate on `main` every Sunday at 9:41 AM Kuala Lumpur time.
+
+```
+node scripts/ci.js --mock                 # the gate's path with the scripted stand-in; no key, nothing recorded
+node scripts/ci.js --mock --plant A01,A02,A03   # three cases made to miss: shows red (one alone stays green; the bar allows two)
+ANTHROPIC_API_KEY=... node scripts/ci.js  # the gate on the smallest model (data-answers-ci key; about US$0.04 a pass)
+```
+
 ## The record
 
-`.github/workflows/demo-record.yml` reads `/api/stats` every hour. At 8:10 AM Kuala Lumpur time it writes the day that just ended to `results/demo-YYYY-MM-DD.json`. When this month's counted spend crosses 50% or 75% of the workspace limit it opens one issue, which GitHub emails to the owner. It needs the repository variable `DEMO_URL`. A commit that only adds a record does not rebuild the site (`vercel.json`).
+`.github/workflows/demo-record.yml` reads `/api/stats` every hour. On every run it writes each finished UTC day that has no record yet to `results/demo-YYYY-MM-DD.json`, from the demo's first day (31 Oct 2026) and never more than 35 days back (`scripts/missing-days.js`), so a late or skipped run is caught up by the next. A daily dispatch from cron-job.org at 8:23 AM Kuala Lumpur time stands behind GitHub's own schedule. When this month's counted spend crosses 50% or 75% of the workspace limit it opens one issue, which GitHub emails to the owner. It needs the repository variable `DEMO_URL`. A commit that only adds a record does not rebuild the site (`vercel.json`).
 
 ## Run it locally
 

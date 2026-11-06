@@ -39,6 +39,8 @@ Synthetic data only. The table in `data/orders.csv` comes from `scripts/make_dat
 | `lib/tools.js` | The seven tools, registered once; `server.js` serves them over stdio, the demo in memory. |
 | `demo/` | The public demo: one Next.js page on Vercel with every cost and abuse control. See `demo/README.md`. |
 | `results/` | One record a day of the demo's questions and cost, written by `.github/workflows/demo-record.yml`. |
+| `.github/workflows/cases.yml` | The gate in front of the demo: every push runs the twenty-eight cases through the demo's own path on the smallest model, and only a green run on `main` moves the `live` branch Vercel deploys. See `demo/README.md` and `demo/GATE.md`. |
+| `results/ci/` | One record per gate run on `main`, green or red: every case, the verdict, tokens and cost. Measure runs go to `results/ci-measure/`. |
 
 ## Run it
 
