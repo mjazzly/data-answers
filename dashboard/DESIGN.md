@@ -61,7 +61,7 @@ One report page, 1280 by 720, read top to bottom in the order the decision is ma
 | Month [ 2025-12 v ]  (single select, default 2025-12)   Branch [ All v ]  (single select)  |
 +------------------------------------------------------------------------------------------+
 | Revenue       | Net revenue   | Returns rate  | Average order | Month on month growth  |
-| 147,575.80    | 134,731.90    | 7.82%         | 250.98        | 9.98%                  |
+| 147.6K        | 134.7K        | 7.82%         | 250.98        | 9.98%                  |
 +------------------------------------------------------------------------------------------+
 | Branches ranked by net revenue                                                           |
 | Branch      Net revenue   Returns rate   Month on month growth   Attention              |
@@ -77,6 +77,8 @@ One report page, 1280 by 720, read top to bottom in the order the decision is ma
 | Revenue by category, All branches, 2025-12 | Revenue by channel, All branches, 2025-12   |
 |   bars, largest first, one shared scale    |   bars, largest first, one shared scale     |
 +--------------------------------------------+---------------------------------------------+
+| Amounts are order values in one currency, shown without a symbol. All data is synthetic.  |
++------------------------------------------------------------------------------------------+
 ```
 
 **The flag rule, in words a non-analyst reads:** *A branch is marked amber when, in the month under
@@ -97,15 +99,17 @@ top category and the top channel revenue in the current selection) through the a
 `month_axis` (decision 4). The branch slicer filters everything except the table (decision 5).
 
 **Phone layout** (View, Mobile layout), in this order: title, month slicer, branch slicer, the five
-callouts, the table, the trend, revenue by category, revenue by channel. Whether Publish to web shows
+callouts, the table, the trend, revenue by category, revenue by channel, the footer. Whether Publish to web shows
 the phone layout in a phone browser is to be confirmed by opening the link on a phone in Phase B; the
 site's Phase C plan (a still picture plus a link on phones) does not depend on it.
 
 ## 3. The measures
 
 Every measure that shares a name with a `metrics.json` metric has that metric's `definition`, word for
-word, as its Description, and the format for its unit. Megat writes the DAX in Power BI Desktop; each
-row gives one known case to check his own measure against. The table holds 2025 only.
+word, as its Description, and the format for its unit. Claude Code drafts every measure's DAX; Megat
+reviews and approves it before it goes into the model (corrected 8 Nov 2026: Megat does not write
+DAX from scratch). Each row gives one known case to check each measure against on a scratch card. The
+table holds 2025 only.
 
 | Measure | Metric | Format | Check it with | Expected |
 |---|---|---|---|---|
@@ -132,6 +136,45 @@ The Descriptions, copied from `metrics.json`:
 `mom_growth` follows its definition: blank unless exactly one month is in the filter, and blank for
 2025-01. There is no date table and no relationship on purpose; the month before can be found from
 `order_date` or from the `month` text.
+
+**The drafted DAX** (approved by Megat as drafted, 8 Nov 2026). All eight live in the `fct_orders` table.
+
+```dax
+orders = COUNTROWS ( fct_orders )
+
+returns = CALCULATE ( COUNTROWS ( fct_orders ), KEEPFILTERS ( fct_orders[returned] = TRUE () ) )
+
+revenue = SUM ( fct_orders[order_value] )
+
+returned_value = CALCULATE ( [revenue], KEEPFILTERS ( fct_orders[returned] = TRUE () ) )
+
+net_revenue = [revenue] - [returned_value]
+
+returns_rate = DIVIDE ( COALESCE ( [returns], 0 ), [orders] )
+
+average_order_value = DIVIDE ( [revenue], [orders] )
+
+mom_growth =
+VAR this_month = SELECTEDVALUE ( fct_orders[month] )
+VAR month_before = FORMAT ( EOMONTH ( MIN ( fct_orders[order_date] ), -1 ), "yyyy-MM" )
+VAR revenue_before =
+    CALCULATE (
+        [revenue],
+        REMOVEFILTERS ( fct_orders[month], fct_orders[quarter], fct_orders[order_date] ),
+        fct_orders[month] = month_before
+    )
+RETURN
+    IF ( NOT ISBLANK ( this_month ), DIVIDE ( [revenue] - revenue_before, revenue_before ) )
+```
+
+Why each choice:
+- `KEEPFILTERS` keeps a filter already on `returned` (a slicer on it) instead of overriding it.
+- `COALESCE ( [returns], 0 )` makes a branch with orders and no returns read 0.00%, not blank (Hillside
+  in December). With no orders, `DIVIDE` still gives blank.
+- `net_revenue` subtracts a blank as 0, so a period with no returns gives its whole revenue.
+- `mom_growth` is blank unless one month is in the filter. The month before comes from `order_date`.
+  Only the month, quarter and date filters are lifted for it, so branch, category and channel filters
+  still apply. January's month before, 2024-12, has no rows, so `DIVIDE` gives blank.
 
 **Helper measures** (not metrics; each still carries a Description saying what it is for):
 `page_subtitle` (the month and branch shown under the title), `attention` (the words in the
@@ -257,7 +300,7 @@ the same query and get the same file.
 ## 6. Design rules for the report
 
 A report theme, `dashboard/theme.json`, holds them, so they live in git and Megat imports one file
-(View, Themes, Browse for themes):
+(Design ribbon, Import theme, in Power BI Desktop 2.159):
 
 - **Colours, one meaning each:** marine `#2C5F7C` for values (the line, the bars); marine deep
   `#214A62` for the selected month; amber `#B07E23` for attention only, with amber tint `#F7EFDD`
@@ -271,6 +314,13 @@ A report theme, `dashboard/theme.json`, holds them, so they live in git and Mega
   display ("Net revenue"), which changes no measure.
 - **No currency symbol anywhere:** `order_value`'s own format set to `#,0.00` after it becomes Fixed
   decimal, and every amount measure `#,0.00`.
+- **Amounts on the cards in thousands, one decimal** (added 8 Nov 2026): the Revenue and Net revenue
+  cards set the visual's display units to Thousands with 1 decimal place (147.6K). The measures keep
+  `#,0.00`, so the check is unchanged. The branch table shows full values (27,517.80). The Average
+  order value card keeps full values, 250.98, because in thousands it would read 0.3K (recommended,
+  to confirm). Percent cards are unchanged.
+- **Footer, one line** (added 8 Nov 2026): "Amounts are order values in one currency, shown without a
+  symbol. All data is synthetic."
 - No dashes in report text; the subtitle joins with "·".
 - Every visual has alt text saying what it shows; tab order follows the reading order.
 - Synthetic data: the eight place-type branch names only, amounts to 2 places.
@@ -314,22 +364,29 @@ Given one instruction at a time when we get there. Every sign-in and setting is 
    in the browser window Git opens.
 3. **Power BI Desktop** from the Microsoft Store. Sign in with the tenant account. In File, Options,
    Preview features: if "Power BI Project (.pbip) save option" and "Store semantic model using TMDL
-   format" are listed, turn both on, and restart.
+   format" are listed, turn both on, and restart. (Done 8 Nov 2026 on 2.159.1231.0: neither was
+   listed, both are standard; "Detect and reload external PBIP changes" was already on.)
 4. **Load the data.** New report. Manage parameters: `RepoPath`, Text, `C:\repos\data-answers`.
    Get data, Parquet, then in the Advanced Editor point the source at
    `RepoPath & "\dashboard\data\fct_orders.parquet"`. Keep rows where `export_batch` = 1. Set
    `order_value` to Fixed decimal number, then its format to `#,0.00`. Name the query `fct_orders`.
-   Add `month_axis` as a reference to `fct_orders`, keeping the `month` column, distinct.
+   Add `month_axis` as a reference to `fct_orders`, keeping the `month` column, distinct. (Done as two
+   blank queries in the Advanced Editor. Power BI joined the two `month` columns by itself and Auto
+   date/time added hidden date tables and a join; the join was deleted, and in Options, Current file,
+   Data Load, "Auto date/time" and "Autodetect new relationships" were turned off.)
 5. **Save as a Power BI project:** `C:\repos\data-answers\dashboard\report\Branch review.pbip`.
-   Commit and push; Claude Code reviews the model text from the Mac.
-6. **Import the theme** `dashboard\theme.json`.
-7. **Write the eight measures**, each with its Description and format (section 3), checking each
-   against its case on a scratch card. Then the helper measures. Save, commit, push; review.
+   Commit and push; Claude Code reviews the model text from the Mac. (Done: `6f2b263`.)
+6. **Import the theme** `dashboard\theme.json` (Design ribbon, Import theme, in 2.159).
+7. **The eight measures.** Claude Code drafts them (section 3) and Megat approves the draft. Megat
+   saves, commits and pushes the project from the PC. On the Mac, Claude Code pulls, writes the eight
+   measures with their Descriptions and formats into `fct_orders.tmdl`, runs the check and pushes.
+   Megat pulls on the PC; Power BI reloads the changed project files, and Megat checks each measure on
+   a scratch card against its expected number. The helper measures follow the same way.
 8. **Build the page** (section 2), then the phone layout. Save, commit, push; review.
 9. **Run the agreement query** in a DAX query view tab, copy the results with headers into Notepad,
    save as `dashboard\agreement.tsv`. Commit and push. On the Mac: pull and
    `node scripts/check_dashboard.js`.
-10. **Tenant settings** (Admin portal, his account): Tenant settings, Advanced networking, Block Public
+10. **Tenant settings** (Admin portal, Megat's account): Tenant settings, Advanced networking, Block Public
     Internet Access to Disabled; then Export and sharing settings, Publish to web, allow users to
     create new embed codes.
 11. **Microsoft 365 Business Basic** added to the same tenant (admin.microsoft.com; confirm the price

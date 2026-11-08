@@ -1,6 +1,56 @@
 table fct_orders
 	lineageTag: 09b50f6c-555d-4cae-8e2e-f5ab36ea5327
 
+	/// Count of orders placed in the period, returned or not.
+	measure orders = COUNTROWS ( fct_orders )
+		formatString: #,0
+		lineageTag: c8f49fb2-1115-43bb-8aa7-f3ed6fad4ef6
+
+	/// Count of orders placed in the period that were later returned.
+	measure returns = CALCULATE ( COUNTROWS ( fct_orders ), KEEPFILTERS ( fct_orders[returned] = TRUE () ) )
+		formatString: #,0
+		lineageTag: ced9d8bc-879c-4a5e-ac77-d30b5db6a9a2
+
+	/// Sum of the order value of every order placed in the period, before returns.
+	measure revenue = SUM ( fct_orders[order_value] )
+		formatString: #,0.00
+		lineageTag: d6177a3b-434d-4625-989b-21359a03a034
+
+	/// Sum of the order value of the orders placed in the period that were later returned.
+	measure returned_value = CALCULATE ( [revenue], KEEPFILTERS ( fct_orders[returned] = TRUE () ) )
+		formatString: #,0.00
+		lineageTag: 90b1f458-1f29-49a1-8a9d-a65ff8769573
+
+	/// Revenue minus returned value: the order value of the orders placed in the period that were not returned.
+	measure net_revenue = [revenue] - [returned_value]
+		formatString: #,0.00
+		lineageTag: f8c10e27-3d75-4eef-bebd-16f9b4dd6b61
+
+	/// Returns divided by orders, as a percent: the share of orders placed in the period that were later returned.
+	measure returns_rate = DIVIDE ( COALESCE ( [returns], 0 ), [orders] )
+		formatString: 0.00%
+		lineageTag: 35703d0e-7277-4627-a6f9-1b3a6601f4f4
+
+	/// Revenue divided by orders: the mean order value of the orders placed in the period.
+	measure average_order_value = DIVIDE ( [revenue], [orders] )
+		formatString: #,0.00
+		lineageTag: 2295caf9-62d4-4f6a-ac9d-8f21a0045373
+
+	/// Revenue in the month minus revenue in the month before, divided by the month before, as a percent. The period must be one month, and January has no month before it in the data.
+	measure mom_growth =
+			VAR this_month = SELECTEDVALUE ( fct_orders[month] )
+			VAR month_before = FORMAT ( EOMONTH ( MIN ( fct_orders[order_date] ), -1 ), "yyyy-MM" )
+			VAR revenue_before =
+			    CALCULATE (
+			        [revenue],
+			        REMOVEFILTERS ( fct_orders[month], fct_orders[quarter], fct_orders[order_date] ),
+			        fct_orders[month] = month_before
+			    )
+			RETURN
+			    IF ( NOT ISBLANK ( this_month ), DIVIDE ( [revenue] - revenue_before, revenue_before ) )
+		formatString: 0.00%
+		lineageTag: e4bb1dc3-4736-40dc-a586-a3e7f0acb875
+
 	column order_id
 		dataType: string
 		lineageTag: 440bfed4-7627-4d46-bee8-f6f8b0239473
