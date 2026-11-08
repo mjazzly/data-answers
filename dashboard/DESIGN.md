@@ -517,7 +517,9 @@ Given one instruction at a time when we get there. Every sign-in and setting is 
     organization, a one-person tenant. The account shows a Free license; whether that can create the
     link is seen at step 12.)
 11. **Microsoft 365 Business Basic** added to the same tenant (admin.microsoft.com; confirm the price
-    on the page) before the link goes on the site.
+    on the page) before the link goes on the site. (Skipped 9 Nov 2026 by Megat's choice: no paid subscriptions. Step 12
+    goes ahead on the Free account; if Publish to web needs a paid licence there, that is decided
+    then.)
 12. **Publish** to My workspace, create the Publish to web link and embed code, and open the link in a
     private window on the Mac to confirm it loads with no sign-in. Open it on a phone too (section 2).
 
