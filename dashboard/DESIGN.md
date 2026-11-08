@@ -419,7 +419,9 @@ A report theme, `dashboard/theme.json`, holds them, so they live in git and Mega
   `#214A62` for the selected month; amber `#B07E23` for attention only, with amber tint `#F7EFDD`
   behind a flagged row; ink `#172529` for text, ink soft `#4F6166` for secondary text, line
   `#DEE2E6` for gridlines; page `#F3F4F6`, visuals on white `#FFFFFF`. From the site's `style.css`.
-- **Segoe UI** throughout (Manrope does not render in the Power BI service).
+- **Segoe UI** throughout (Manrope does not render in the Power BI service), named in `theme.json`
+  with Power BI's web fallbacks (`wf_segoe-ui_semibold, helvetica, arial, sans-serif`): named alone,
+  the titles fell back to a serif font on a Mac, where Segoe UI is not installed (seen 9 Nov 2026).
 - No gradients, no 3D, no pie or donut charts, no shadows, no visual borders; rounded visual corners
   to sit beside the site's panels, **one radius, 8**, on every visual (step 8, 8 Nov 2026): the
   callout tiles' own radius in the base theme, set in `theme.json` for every visual's container, the
@@ -527,6 +529,9 @@ Given one instruction at a time when we get there. Every sign-in and setting is 
     `https://app.powerbi.com/view?r=eyJrIjoiYjFhM2Q3OGEtNzkwOS00ZjRlLWE0MDktY2RmMTNhNjUxODEyIiwidCI6ImY0ZjM0NzE0LWYzZTEtNGY1NC04ZTg0LTYxYWQyYWQ3ZWRkNCIsImMiOjEwfQ%3D%3D`.
     Power BI's embed code is an iframe of that link, 600 by 373.5; Phase C sets its own size. It
     exposes the whole semantic model, all synthetic. Republishing from Desktop to My workspace
-    updates it in place; deleting it under Settings, Manage embed codes stops it at once.)
+    updates it in place; deleting it under Settings, Manage embed codes stops it at once. Checked 9 Nov
+    2026: loads with no sign-in in a private window on the Mac, the slicers work, and no Filters pane
+    shows. On a phone browser it shows the desktop page shrunk, not the phone layout, so the site's
+    plan for phones (a still picture plus the link) stands.)
 
 Then Phase C, in the site's own session, once the check is green.

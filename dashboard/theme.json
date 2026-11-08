@@ -15,10 +15,10 @@
   "center": "#CFE0EA",
   "minimum": "#F3F4F6",
   "textClasses": {
-    "callout": { "fontFace": "Segoe UI Semibold", "fontSize": 24, "color": "#172529" },
-    "title": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#172529" },
-    "header": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#172529" },
-    "label": { "fontFace": "Segoe UI", "fontSize": 10, "color": "#4F6166" }
+    "callout": { "fontFace": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif", "fontSize": 24, "color": "#172529" },
+    "title": { "fontFace": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif", "fontSize": 12, "color": "#172529" },
+    "header": { "fontFace": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif", "fontSize": 12, "color": "#172529" },
+    "label": { "fontFace": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif", "fontSize": 10, "color": "#4F6166" }
   },
   "visualStyles": {
     "*": {
@@ -26,7 +26,7 @@
         "background": [{ "show": true, "color": { "solid": { "color": "#FFFFFF" } }, "transparency": 0 }],
         "border": [{ "show": true, "width": 1, "color": { "solid": { "color": "#FFFFFF" } }, "radius": 8 }],
         "dropShadow": [{ "show": false }],
-        "title": [{ "fontFamily": "Segoe UI Semibold", "fontSize": 12, "fontColor": { "solid": { "color": "#172529" } } }]
+        "title": [{ "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif", "fontSize": 12, "fontColor": { "solid": { "color": "#172529" } } }]
       }
     },
     "slicer": {
