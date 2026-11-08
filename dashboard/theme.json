@@ -24,9 +24,20 @@
     "*": {
       "*": {
         "background": [{ "show": true, "color": { "solid": { "color": "#FFFFFF" } }, "transparency": 0 }],
-        "border": [{ "show": false, "radius": 14 }],
+        "border": [{ "show": false, "radius": 8 }],
         "dropShadow": [{ "show": false }],
         "title": [{ "fontFamily": "Segoe UI Semibold", "fontSize": 12, "fontColor": { "solid": { "color": "#172529" } } }]
+      }
+    },
+    "slicer": {
+      "*": {
+        "background": [{ "show": true, "color": { "solid": { "color": "#FFFFFF" } }, "transparency": 0 }],
+        "border": [{ "show": false, "radius": 8 }]
+      }
+    },
+    "cardVisual": {
+      "*": {
+        "shapeCustomRectangle": [{ "$id": "default", "tileShape": "rectangleRoundedByPixel", "rectangleRoundedCurve": 8, "rectangleRoundedCurveCustomStyle": false }]
       }
     },
     "page": {

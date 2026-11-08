@@ -97,10 +97,18 @@ In measure terms: `returns_rate` for the branch above `returns_rate` for all bra
 month, or `mom_growth` below zero. The Attention column says which part in words, so the flag never
 rests on colour alone.
 
-**Sizes and scales.** The five callouts share one size. The two detail charts share one width, the same
-bar thickness (the channel chart is three quarters the height of the category chart, three bars to
-four), and one x axis: both run from 0 to the same maximum, set by a helper measure (the larger of the
-top category and the top channel revenue in the current selection) through the axis's fx setting.
+**Sizes and scales.** The five callouts share one size. The two detail charts share one size (608 by
+200, changed in step 8 from a shorter channel chart, which pushed Phone behind a scrollbar), the same
+bar thickness (space between categories 50% on the category chart, the theme's default, and 62.5% on
+the channel chart: a bar is (1 − spacing) × height ÷ bars, so 0.5 ÷ 4 = 0.375 ÷ 3), and one x axis:
+both run from 0 to the same maximum, set by a helper measure (the larger of the top category and the
+top channel revenue in the current selection, plus 15% so the longest bar's label fits) through the
+axis's fx setting. Their titles are plain, "Revenue by category" and "Revenue by channel": the
+subtitle above already names the month and branch.
+
+**The branch table's columns** fill its 1232 width (1200 inside the theme's 16 padding each side):
+Branch 150, Net revenue 130, Returns rate 120, Month on month growth 180, Attention the rest, 616 (4
+spare so no horizontal scrollbar appears).
 
 **Interactions.** The month slicer filters everything; the trend keeps all twelve months through
 `month_axis` (decision 4). The branch slicer filters everything except the table (decision 5).
@@ -194,7 +202,9 @@ month, and the Attention column says "the month before"). All six live in `fct_o
 is on `fct_orders[month]` and the branch slicer on `fct_orders[branch]`. `page_subtitle` was changed
 in step 8, approved by Megat 8 Nov 2026, once the branch slicer became multi-select with Ctrl: it
 counts the branches when several are picked, and decides "All branches" with `ISFILTERED`, so a month
-where a branch has no orders still reads "All branches" when nothing is picked.
+where a branch has no orders still reads "All branches" when nothing is picked. `detail_scale_max`
+gained 15% headroom in step 8, approved by Megat 8 Nov 2026, when the In store bar's label had no room
+at the edge of the scale.
 
 ```dax
 /// The month and branch under the page title, following the two slicers: the branch's name when one
@@ -253,14 +263,14 @@ RETURN
     IF ( NOT ISBLANK ( picked ) && SELECTEDVALUE ( month_axis[month] ) = picked, [trend_revenue] )
 
 /// The shared x axis maximum of the two detail charts: the larger of the top category's and the top
-/// channel's revenue in the current selection.
+/// channel's revenue in the current selection, plus 15% so the longest bar's label fits.
 detail_scale_max =
 VAR top_category =
     CALCULATE ( MAXX ( VALUES ( fct_orders[category] ), [revenue] ), REMOVEFILTERS ( fct_orders[category] ) )
 VAR top_channel =
     CALCULATE ( MAXX ( VALUES ( fct_orders[channel] ), [revenue] ), REMOVEFILTERS ( fct_orders[channel] ) )
 RETURN
-    MAX ( top_category, top_channel )
+    MAX ( top_category, top_channel ) * 1.15
 ```
 
 Formats: `page_subtitle`, `attention` and `attention_colour` are text; the three others `#,0.00`.
@@ -272,7 +282,7 @@ Formats: `page_subtitle`, `attention` and `attention_colour` are text; the three
 | `attention_colour` | the same table | #F7EFDD on those three rows only |
 | `trend_revenue` | by `month_axis[month]`, month slicer 2025-12 | twelve months; 2025-03 reads 97,694.60 |
 | `trend_selected_month` | the same | 147,575.80 at 2025-12 only |
-| `detail_scale_max` | month 2025-12, all branches; then Westgate | 86,624.80 (In store); 17,035.20 (In store) |
+| `detail_scale_max` | month 2025-12, all branches; then Westgate | 99,618.52 (In store 86,624.80 × 1.15); 19,590.48 (17,035.20 × 1.15) |
 
 **The page on its default view, 2025-12, all branches** (computed from `fct_orders` batch 1 with the
 assistant's rounding rule, `lib/round.js`), so the finished page can be checked by eye:
@@ -400,7 +410,9 @@ A report theme, `dashboard/theme.json`, holds them, so they live in git and Mega
   `#DEE2E6` for gridlines; page `#F3F4F6`, visuals on white `#FFFFFF`. From the site's `style.css`.
 - **Segoe UI** throughout (Manrope does not render in the Power BI service).
 - No gradients, no 3D, no pie or donut charts, no shadows, no visual borders; rounded visual corners
-  to sit beside the site's panels.
+  to sit beside the site's panels, **one radius, 8**, on every visual (step 8, 8 Nov 2026): the
+  callout tiles' own radius in the base theme, set in `theme.json` for every visual's container, the
+  slicers' white panels and the callout tiles, so no visual carries its own corner or border setting.
 - **Titles in sentence case that say what the visual answers** ("Branches ranked by net revenue",
   "Revenue by month, 2025"). Measure names stay as in `metrics.json`; each visual renames its field for
   display ("Net revenue"), which changes no measure.
