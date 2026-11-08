@@ -197,51 +197,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "6aa6b1c104818a52ab29",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "month_axis"
-              }
-            },
-            "Property": "month"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "16a6e223063da2a54221",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fct_orders"
-              }
-            },
-            "Property": "trend_selected_month"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "4eef20241026130eb4d2",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fct_orders"
-              }
-            },
-            "Property": "trend_revenue"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }
