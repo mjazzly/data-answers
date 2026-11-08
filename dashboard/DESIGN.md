@@ -287,6 +287,7 @@ A report theme, `dashboard/theme.json`, holds them, so they live in git and Mega
 | `dashboard/agreement.dax` | Claude Code | step 3 |
 | `dashboard/theme.json` | Claude Code | step 3 |
 | `scripts/check_dashboard.js` | Claude Code | step 3 |
+| `test/dashboard.js` (added in step 3: tests the check on a stand-in project, sixteen scenarios, no Power BI) | Claude Code | step 3 |
 | `package.json`: `"dashboard:data"`, `"dashboard:check"` scripts | Claude Code | steps 2 and 3 |
 | `.gitignore`: `DASHBOARD-BRIEF.md`, and `dashboard/report/**/.pbi/cache.abf` and `localSettings.json` beside the project's own ignore file | Claude Code | step 2 |
 | `README.md`: one short "The dashboard" paragraph | Claude Code | step 3 |

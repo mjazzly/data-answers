@@ -122,6 +122,26 @@ node test/vocab.js
 
 **The late returns limit.** A return for a batch 2 order sits in batch 2 only. `scripts/load_batch.js` appends rows and never updates an earlier one, so a late return for a batch 1 order could not be shown. The test `assert_returns_in_order_batch` turns red on one rather than hiding it.
 
+## The dashboard
+
+A Power BI report on `fct_orders`, for an operations lead at the month-end review choosing which branches need attention next month. It reads the same table and uses the same metric definitions as the assistant: each measure is named as in `metrics.json` and carries that metric's definition as its description. The design, the measures and the agreement check are in `dashboard/DESIGN.md`.
+
+| Path | What it is |
+|---|---|
+| `dashboard/data/fct_orders.parquet` | The table the report loads, copied by `scripts/export_dashboard.js` only after a whole passing dbt build. The report keeps `export_batch` 1, the state the cases assume. |
+| `dashboard/report/` | The report as a Power BI project: the model, the measures and the page as text. |
+| `dashboard/agreement.dax` | The query that evaluates the report's own measures on the fourteen case questions it can answer. |
+| `dashboard/agreement.tsv` | Its result, run in Power BI Desktop. |
+| `dashboard/theme.json` | Colours and type for the report. |
+| `scripts/check_dashboard.js` | Checks the measures' names, descriptions and formats, then compares the result with `eval/expected/cases.json` and writes `results/dashboard/`. |
+| `test/dashboard.js` | Tests the check on a stand-in project, no Power BI needed. |
+
+```
+node scripts/export_dashboard.js --check  # the committed Parquet holds exactly the rows of fct_orders
+node scripts/check_dashboard.js           # the model, then the agreement
+node test/dashboard.js
+```
+
 ## Limits
 
 One synthetic table of one calendar year; twelve metrics; five dimensions; one data folder; no chart, no export, no external system connected. A question that needs two metrics combined (revenue per returned order, say) is two blocks, never a computed third number.

@@ -1,0 +1,39 @@
+{
+  "name": "Branch review",
+  "dataColors": ["#2C5F7C", "#214A62", "#B07E23", "#4F6166", "#7E8E92", "#CFE0EA", "#E4EDF3", "#F7EFDD"],
+  "foreground": "#172529",
+  "foregroundNeutralSecondary": "#4F6166",
+  "foregroundNeutralTertiary": "#7E8E92",
+  "background": "#FFFFFF",
+  "backgroundLight": "#F3F4F6",
+  "backgroundNeutral": "#DEE2E6",
+  "tableAccent": "#2C5F7C",
+  "good": "#2C5F7C",
+  "neutral": "#7E8E92",
+  "bad": "#B07E23",
+  "maximum": "#214A62",
+  "center": "#CFE0EA",
+  "minimum": "#F3F4F6",
+  "textClasses": {
+    "callout": { "fontFace": "Segoe UI Semibold", "fontSize": 24, "color": "#172529" },
+    "title": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#172529" },
+    "header": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#172529" },
+    "label": { "fontFace": "Segoe UI", "fontSize": 10, "color": "#4F6166" }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{ "show": true, "color": { "solid": { "color": "#FFFFFF" } }, "transparency": 0 }],
+        "border": [{ "show": false, "radius": 14 }],
+        "dropShadow": [{ "show": false }],
+        "title": [{ "fontFamily": "Segoe UI Semibold", "fontSize": 12, "fontColor": { "solid": { "color": "#172529" } } }]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [{ "color": { "solid": { "color": "#F3F4F6" } }, "transparency": 0 }],
+        "outspace": [{ "color": { "solid": { "color": "#F3F4F6" } }, "transparency": 0 }]
+      }
+    }
+  }
+}

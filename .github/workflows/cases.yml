@@ -2,11 +2,14 @@
 # dispatch (the weekly rerun from cron-job.org calls the dispatch endpoint for main):
 #   0. No key: the tested tables (transform/DESIGN.md). The raw export must be what scripts/make_raw.js
 #      writes, dbt build runs every model and test on it, and the export from fct_orders must equal
-#      data/orders.csv and data/batch_2.csv byte for byte, so a bad row stops the run here.
+#      data/orders.csv and data/batch_2.csv byte for byte, so a bad row stops the run here. The
+#      dashboard's Parquet file must hold exactly the rows of fct_orders, and the dashboard check must
+#      pass its stand-in project (dashboard/DESIGN.md).
 #   1. No key: the harness mock, the demo's mock check, the demo's tests, the demo's build.
-#   2. With the data-answers-ci workspace key: the twenty-eight cases through the demo's own path on the
-#      smallest model, marked by eval/check.js against the bar in harness.json (demo/scripts/ci.js; one
-#      rerun of the whole pass before red).
+#   2. On main only, with the data-answers-ci workspace key: the twenty-eight cases through the demo's
+#      own path on the smallest model, marked by eval/check.js against the bar in harness.json
+#      (demo/scripts/ci.js; one rerun of the whole pass before red). Any other branch runs 0 and 1
+#      only and spends nothing; its cases first run when it reaches main.
 #   3. On main only: the record is committed to results/ci/ with the [ci] prefix, green or red. A run
 #      that met the bar only on the rerun is "green after rerun": it still moves live, and the workflow
 #      opens one issue naming the cases pass 1 missed (GitHub emails the owner), as demo record does
@@ -72,6 +75,8 @@ jobs:
           cmp data/orders.csv transform/target/export/orders.csv
           cmp data/batch_2.csv transform/target/export/batch_2.csv
           node test/vocab.js
+          node scripts/export_dashboard.js --check
+          node test/dashboard.js
       - name: Tests with no key
         run: |
           npm run mock
@@ -81,6 +86,7 @@ jobs:
           npm run build
       - name: The twenty-eight cases on the smallest model
         id: cases
+        if: github.ref == 'refs/heads/main'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
