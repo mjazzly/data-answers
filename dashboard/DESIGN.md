@@ -468,6 +468,10 @@ A report theme, `dashboard/theme.json`, holds them, so they live in git and Mega
 with no key" step right after `dbt build`, and `node scripts/check_dashboard.js` joins it once the
 .pbip and `agreement.tsv` are in git. Before then the check would stop on a missing file and turn the
 gate red, so it goes in after B5, not in step 3. Both read files only; neither needs Power BI.
+(Done 9 Nov 2026, approved by Megat: `node scripts/check_dashboard.js --no-record` runs after
+`node test/dashboard.js` on every push. CI passes `--no-record` so the record step on main does not
+commit a new file each run; a record is written from the Mac when the project or `agreement.tsv`
+changes. Step 9's first run: model passed, 14 of 14 cases, 44 values.)
 
 ## 8. Phase B: the PC steps, in order
 

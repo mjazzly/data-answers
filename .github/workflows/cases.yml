@@ -3,8 +3,9 @@
 #   0. No key: the tested tables (transform/DESIGN.md). The raw export must be what scripts/make_raw.js
 #      writes, dbt build runs every model and test on it, and the export from fct_orders must equal
 #      data/orders.csv and data/batch_2.csv byte for byte, so a bad row stops the run here. The
-#      dashboard's Parquet file must hold exactly the rows of fct_orders, and the dashboard check must
-#      pass its stand-in project (dashboard/DESIGN.md).
+#      dashboard's Parquet file must hold exactly the rows of fct_orders, the dashboard check must
+#      pass its stand-in project, and the Power BI project itself must pass it: the model, and the
+#      fourteen cases of agreement.tsv (dashboard/DESIGN.md).
 #   1. No key: the harness mock, the demo's mock check, the demo's tests, the demo's build.
 #   2. On main only, with the data-answers-ci workspace key: the twenty-eight cases through the demo's
 #      own path on the smallest model, marked by eval/check.js against the bar in harness.json
@@ -77,6 +78,7 @@ jobs:
           node test/vocab.js
           node scripts/export_dashboard.js --check
           node test/dashboard.js
+          node scripts/check_dashboard.js --no-record
       - name: Tests with no key
         run: |
           npm run mock
