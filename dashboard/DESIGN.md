@@ -191,10 +191,14 @@ column, through `month_axis`), and `detail_scale_max` (the shared x axis maximum
 
 **The helper DAX** (approved by Megat 8 Nov 2026, with two wording changes: the subtitle names the
 month, and the Attention column says "the month before"). All six live in `fct_orders`; the month slicer
-is on `fct_orders[month]` and the branch slicer on `fct_orders[branch]`.
+is on `fct_orders[month]` and the branch slicer on `fct_orders[branch]`. `page_subtitle` was changed
+in step 8, approved by Megat 8 Nov 2026, once the branch slicer became multi-select with Ctrl: it
+counts the branches when several are picked, and decides "All branches" with `ISFILTERED`, so a month
+where a branch has no orders still reads "All branches" when nothing is picked.
 
 ```dax
-/// The month and branch under the page title, following the two slicers.
+/// The month and branch under the page title, following the two slicers: the branch's name when one
+/// is picked, the number of branches when several are, All branches when none is.
 page_subtitle =
 VAR month_name =
     IF (
@@ -202,8 +206,16 @@ VAR month_name =
         FORMAT ( MIN ( fct_orders[order_date] ), "mmmm yyyy", "en-GB" ),
         "All months"
     )
+VAR branches = COUNTROWS ( VALUES ( fct_orders[branch] ) )
+VAR branch_name =
+    SWITCH (
+        TRUE (),
+        NOT ISFILTERED ( fct_orders[branch] ), "All branches",
+        branches = 1, VALUES ( fct_orders[branch] ),
+        branches & " branches"
+    )
 RETURN
-    month_name & " · " & SELECTEDVALUE ( fct_orders[branch], "All branches" )
+    month_name & " · " & branch_name
 
 /// The words in the branch table's Attention column: which part of the flag rule a branch meets in the
 /// month under review. Blank when it meets neither, and on the total row.
@@ -255,7 +267,7 @@ Formats: `page_subtitle`, `attention` and `attention_colour` are text; the three
 
 | Helper | Check it with | Expected |
 |---|---|---|
-| `page_subtitle` | month 2025-12; then branch Westgate | December 2025 · All branches; December 2025 · Westgate |
+| `page_subtitle` | month 2025-12; then branch Westgate; then Westgate and Harbour | December 2025 · All branches; December 2025 · Westgate; December 2025 · 2 branches |
 | `attention` | a table by branch, month 2025-12 | Westgate both parts, Northpoint returns, Hillside revenue down, five blank |
 | `attention_colour` | the same table | #F7EFDD on those three rows only |
 | `trend_revenue` | by `month_axis[month]`, month slicer 2025-12 | twelve months; 2025-03 reads 97,694.60 |
