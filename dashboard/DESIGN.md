@@ -56,7 +56,7 @@ One report page, 1280 by 720, read top to bottom in the order the decision is ma
 ```
 +------------------------------------------------------------------------------------------+
 | Which branches need attention next month?                                                 |
-| 2025-12 · All branches                                (subtitle, a measure, follows slicers)|
+| December 2025 · All branches                          (subtitle, a measure, follows slicers)|
 +------------------------------------------------------------------------------------------+
 | Month [ 2025-12 v ]  (single select, default 2025-12)   Branch [ All v ]  (single select)  |
 +------------------------------------------------------------------------------------------+
@@ -66,8 +66,8 @@ One report page, 1280 by 720, read top to bottom in the order the decision is ma
 | Branches ranked by net revenue                                                           |
 | Branch      Net revenue   Returns rate   Month on month growth   Attention              |
 | Central       27,517.80        5.88%            20.54%                                     |
-| Westgate      26,491.50       11.54%           -10.15%    ● Returns above all branches;   |
-|                                                              revenue down on last month   |
+| Westgate      26,491.50       11.54%           -10.15%  ● Returns above all branches;     |
+|                                                          revenue down on the month before |
 | Harbour       21,131.70        7.14%            10.58%                                     |
 | ...                                                                                        |
 +------------------------------------------------------------------------------------------+
@@ -181,6 +181,79 @@ Why each choice:
 Attention column, blank when not flagged), `attention_colour` (amber when flagged, for the table's
 conditional formatting), `trend_revenue` and `trend_selected_month` (the trend's line and its marked
 column, through `month_axis`), and `detail_scale_max` (the shared x axis maximum).
+
+**The helper DAX** (approved by Megat 8 Nov 2026, with two wording changes: the subtitle names the
+month, and the Attention column says "the month before"). All six live in `fct_orders`; the month slicer
+is on `fct_orders[month]` and the branch slicer on `fct_orders[branch]`.
+
+```dax
+/// The month and branch under the page title, following the two slicers.
+page_subtitle =
+VAR month_name =
+    IF (
+        HASONEVALUE ( fct_orders[month] ),
+        FORMAT ( MIN ( fct_orders[order_date] ), "mmmm yyyy", "en-GB" ),
+        "All months"
+    )
+RETURN
+    month_name & " · " & SELECTEDVALUE ( fct_orders[branch], "All branches" )
+
+/// The words in the branch table's Attention column: which part of the flag rule a branch meets in the
+/// month under review. Blank when it meets neither, and on the total row.
+attention =
+VAR returns_high =
+    [returns_rate] > CALCULATE ( [returns_rate], REMOVEFILTERS ( fct_orders[branch] ) )
+VAR revenue_down = NOT ISBLANK ( [mom_growth] ) && [mom_growth] < 0
+RETURN
+    IF (
+        HASONEVALUE ( fct_orders[branch] ),
+        SWITCH (
+            TRUE (),
+            returns_high && revenue_down, "● Returns above all branches; revenue down on the month before",
+            returns_high, "● Returns above all branches",
+            revenue_down, "● Revenue down on the month before"
+        )
+    )
+
+/// The amber tint behind a flagged row of the branch table (background colour, by field value).
+attention_colour = IF ( NOT ISBLANK ( [attention] ), "#F7EFDD" )
+
+/// The trend's line: revenue for each month of month_axis, ignoring the month slicer so all twelve
+/// months stay on the line. The branch slicer still applies.
+trend_revenue =
+CALCULATE (
+    [revenue],
+    REMOVEFILTERS ( fct_orders[month], fct_orders[quarter], fct_orders[order_date] ),
+    TREATAS ( VALUES ( month_axis[month] ), fct_orders[month] )
+)
+
+/// The trend's pale column: the selected month's revenue at that month only, blank at the others.
+trend_selected_month =
+VAR picked = SELECTEDVALUE ( fct_orders[month] )
+RETURN
+    IF ( NOT ISBLANK ( picked ) && SELECTEDVALUE ( month_axis[month] ) = picked, [trend_revenue] )
+
+/// The shared x axis maximum of the two detail charts: the larger of the top category's and the top
+/// channel's revenue in the current selection.
+detail_scale_max =
+VAR top_category =
+    CALCULATE ( MAXX ( VALUES ( fct_orders[category] ), [revenue] ), REMOVEFILTERS ( fct_orders[category] ) )
+VAR top_channel =
+    CALCULATE ( MAXX ( VALUES ( fct_orders[channel] ), [revenue] ), REMOVEFILTERS ( fct_orders[channel] ) )
+RETURN
+    MAX ( top_category, top_channel )
+```
+
+Formats: `page_subtitle`, `attention` and `attention_colour` are text; the three others `#,0.00`.
+
+| Helper | Check it with | Expected |
+|---|---|---|
+| `page_subtitle` | month 2025-12; then branch Westgate | December 2025 · All branches; December 2025 · Westgate |
+| `attention` | a table by branch, month 2025-12 | Westgate both parts, Northpoint returns, Hillside revenue down, five blank |
+| `attention_colour` | the same table | #F7EFDD on those three rows only |
+| `trend_revenue` | by `month_axis[month]`, month slicer 2025-12 | twelve months; 2025-03 reads 97,694.60 |
+| `trend_selected_month` | the same | 147,575.80 at 2025-12 only |
+| `detail_scale_max` | month 2025-12, all branches; then Westgate | 86,624.80 (In store); 17,035.20 (In store) |
 
 **The page on its default view, 2025-12, all branches** (computed from `fct_orders` batch 1 with the
 assistant's rounding rule, `lib/round.js`), so the finished page can be checked by eye:

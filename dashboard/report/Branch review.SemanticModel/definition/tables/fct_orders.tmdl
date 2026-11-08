@@ -51,6 +51,71 @@ table fct_orders
 		formatString: 0.00%
 		lineageTag: e4bb1dc3-4736-40dc-a586-a3e7f0acb875
 
+	/// The month and branch under the page title, following the two slicers.
+	measure page_subtitle =
+			VAR month_name =
+			    IF (
+			        HASONEVALUE ( fct_orders[month] ),
+			        FORMAT ( MIN ( fct_orders[order_date] ), "mmmm yyyy", "en-GB" ),
+			        "All months"
+			    )
+			RETURN
+			    month_name & " · " & SELECTEDVALUE ( fct_orders[branch], "All branches" )
+		lineageTag: 9476b5bd-e139-46e8-90a9-96aa6396ce66
+
+	/// The words in the branch table's Attention column: which part of the flag rule a branch meets in the
+	/// month under review. Blank when it meets neither, and on the total row.
+	measure attention =
+			VAR returns_high =
+			    [returns_rate] > CALCULATE ( [returns_rate], REMOVEFILTERS ( fct_orders[branch] ) )
+			VAR revenue_down = NOT ISBLANK ( [mom_growth] ) && [mom_growth] < 0
+			RETURN
+			    IF (
+			        HASONEVALUE ( fct_orders[branch] ),
+			        SWITCH (
+			            TRUE (),
+			            returns_high && revenue_down, "● Returns above all branches; revenue down on the month before",
+			            returns_high, "● Returns above all branches",
+			            revenue_down, "● Revenue down on the month before"
+			        )
+			    )
+		lineageTag: bd941c15-6030-48a7-941a-3be5fa48f490
+
+	/// The amber tint behind a flagged row of the branch table (background colour, by field value).
+	measure attention_colour = IF ( NOT ISBLANK ( [attention] ), "#F7EFDD" )
+		lineageTag: 74a08038-746f-4289-9a9d-a7411edc3bec
+
+	/// The trend's line: revenue for each month of month_axis, ignoring the month slicer so all twelve
+	/// months stay on the line. The branch slicer still applies.
+	measure trend_revenue =
+			CALCULATE (
+			    [revenue],
+			    REMOVEFILTERS ( fct_orders[month], fct_orders[quarter], fct_orders[order_date] ),
+			    TREATAS ( VALUES ( month_axis[month] ), fct_orders[month] )
+			)
+		formatString: #,0.00
+		lineageTag: 0bd90de0-236b-4ac6-9550-4eb408b21098
+
+	/// The trend's pale column: the selected month's revenue at that month only, blank at the others.
+	measure trend_selected_month =
+			VAR picked = SELECTEDVALUE ( fct_orders[month] )
+			RETURN
+			    IF ( NOT ISBLANK ( picked ) && SELECTEDVALUE ( month_axis[month] ) = picked, [trend_revenue] )
+		formatString: #,0.00
+		lineageTag: 69104476-c6bb-4957-b8d9-27b8770db70a
+
+	/// The shared x axis maximum of the two detail charts: the larger of the top category's and the top
+	/// channel's revenue in the current selection.
+	measure detail_scale_max =
+			VAR top_category =
+			    CALCULATE ( MAXX ( VALUES ( fct_orders[category] ), [revenue] ), REMOVEFILTERS ( fct_orders[category] ) )
+			VAR top_channel =
+			    CALCULATE ( MAXX ( VALUES ( fct_orders[channel] ), [revenue] ), REMOVEFILTERS ( fct_orders[channel] ) )
+			RETURN
+			    MAX ( top_category, top_channel )
+		formatString: #,0.00
+		lineageTag: 0b03405c-38cf-47eb-bc91-7464aff38a82
+
 	column order_id
 		dataType: string
 		lineageTag: 440bfed4-7627-4d46-bee8-f6f8b0239473
