@@ -119,7 +119,8 @@ needed a vertical one too. The table is 312 high, so all eight rows show.
 callouts, the table, the trend, revenue by category, revenue by channel, the footer. As built in step 8 (8 Nov
 2026): the phone canvas is 324 wide; every visual full width with 8 between them (the two slicers
 side by side, 158 each); title 56 high at 16 pt so it wraps to two lines, subtitle 28, slicers 56,
-the callouts stacked vertically (value 20 pt, callout size 35%) in 340, the table 320, the trend 200
+the callouts stacked vertically in 360 (value 20 pt; callout size 20%, which in a vertical card is
+each tile's share of the visual's height, so five tiles fill it exactly and it never scrolls), the table 320, the trend 200
 (padding 8 at the sides and a minimum category width of 20, so all twelve months fit), each bar chart
 180, the footer 60 for three lines. The table keeps its five columns and scrolls sideways on a phone:
 the amber rows still say which branches to look at, and a phone-only table would be a second visual

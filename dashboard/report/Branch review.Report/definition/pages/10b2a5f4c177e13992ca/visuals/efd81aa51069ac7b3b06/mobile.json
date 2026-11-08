@@ -4,7 +4,7 @@
     "x": 0,
     "y": 156,
     "z": 4000,
-    "height": 340,
+    "height": 360,
     "width": 324,
     "tabOrder": 4000
   },
@@ -42,7 +42,7 @@
           "calloutSize": {
             "expr": {
               "Literal": {
-                "Value": "35D"
+                "Value": "20D"
               }
             }
           }
