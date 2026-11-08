@@ -512,7 +512,10 @@ Given one instruction at a time when we get there. Every sign-in and setting is 
    `node scripts/check_dashboard.js`.
 10. **Tenant settings** (Admin portal, Megat's account): Tenant settings, Advanced networking, Block Public
     Internet Access to Disabled; then Export and sharing settings, Publish to web, allow users to
-    create new embed codes.
+    create new embed codes. (Done 9 Nov 2026: Block Public Internet Access was already Disabled and Publish to
+    web already Enabled; Megat turned on "Allow users to create new embed codes" for the entire
+    organization, a one-person tenant. The account shows a Free license; whether that can create the
+    link is seen at step 12.)
 11. **Microsoft 365 Business Basic** added to the same tenant (admin.microsoft.com; confirm the price
     on the page) before the link goes on the site.
 12. **Publish** to My workspace, create the Publish to web link and embed code, and open the link in a
