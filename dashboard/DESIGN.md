@@ -116,7 +116,14 @@ needed a vertical one too. The table is 312 high, so all eight rows show.
 `month_axis` (decision 4). The branch slicer filters everything except the table (decision 5).
 
 **Phone layout** (View, Mobile layout), in this order: title, month slicer, branch slicer, the five
-callouts, the table, the trend, revenue by category, revenue by channel, the footer. Whether Publish to web shows
+callouts, the table, the trend, revenue by category, revenue by channel, the footer. As built in step 8 (8 Nov
+2026): the phone canvas is 324 wide; every visual full width with 8 between them (the two slicers
+side by side, 158 each); title 56 high at 16 pt so it wraps to two lines, subtitle 28, slicers 56,
+the callouts stacked vertically (value 20 pt, callout size 35%) in 340, the table 320, the trend 200
+(padding 8 at the sides and a minimum category width of 20, so all twelve months fit), each bar chart
+180, the footer 60 for three lines. The table keeps its five columns and scrolls sideways on a phone:
+the amber rows still say which branches to look at, and a phone-only table would be a second visual
+to keep in step. Positions are set in each visual's `mobile.json`. Whether Publish to web shows
 the phone layout in a phone browser is to be confirmed by opening the link on a phone in Phase B; the
 site's Phase C plan (a still picture plus a link on phones) does not depend on it.
 
