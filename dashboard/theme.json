@@ -38,6 +38,7 @@
     "cardVisual": {
       "*": {
         "border": [{ "show": false }],
+        "outline": [{ "$id": "default", "show": false }],
         "shapeCustomRectangle": [{ "$id": "default", "tileShape": "rectangleRoundedByPixel", "rectangleRoundedCurve": 8, "rectangleRoundedCurveCustomStyle": false }]
       }
     },

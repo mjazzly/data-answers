@@ -428,7 +428,8 @@ A report theme, `dashboard/theme.json`, holds them, so they live in git and Mega
   slicers' white panels and the callout tiles, so no visual carries its own corner or border setting.
   Power BI draws a container's radius only while its border is on, so the theme turns the border on
   in white, 1 px, on the white panels: rounded, with no visible line. The text boxes and the card
-  visuals (whose tiles carry their own corners) keep the border off.
+  visuals (whose tiles carry their own corners) keep the border off, and the callout tiles have no
+  outline, set once in the theme for every card (9 Nov 2026), so they match the other panels.
 - **Titles in sentence case that say what the visual answers** ("Branches ranked by net revenue",
   "Revenue by month, 2025"). Measure names stay as in `metrics.json`; each visual renames its field for
   display ("Net revenue"), which changes no measure.
