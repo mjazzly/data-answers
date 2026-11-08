@@ -51,7 +51,14 @@ month is marked on the trend. Also confirmed: batch 1 only, eight measures, `agr
 
 ## 2. The page, drawn
 
-One report page, 1280 by 720, read top to bottom in the order the decision is made.
+One report page, 1280 by 1100, read top to bottom in the order the decision is made (changed from
+1280 by 720 by Megat, 8 Nov 2026, when the trend and the detail charts would not fit below the table;
+Publish to web scrolls it in the same order). Placed at: title Y 16, subtitle 56, slicers 96, callouts
+168, table 280 (height 300), trend 596, detail charts 832, footer 1064; all 24 from the left edge.
+
+**Branch slicer, as built in 2.159:** a single-select slicer there always holds one value and cannot
+show All, so the branch slicer is multi-select with Ctrl and shows "Select all"; a plain click still
+picks one branch. The month slicer stays single select: the page is always about one month.
 
 ```
 +------------------------------------------------------------------------------------------+
