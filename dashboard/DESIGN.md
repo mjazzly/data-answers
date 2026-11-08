@@ -107,8 +107,9 @@ axis's fx setting. Their titles are plain, "Revenue by category" and "Revenue by
 subtitle above already names the month and branch.
 
 **The branch table's columns** fill its 1232 width (1200 inside the theme's 16 padding each side):
-Branch 150, Net revenue 130, Returns rate 120, Month on month growth 180, Attention the rest, 616 (4
-spare so no horizontal scrollbar appears).
+Branch 150, Net revenue 130, Returns rate 120, Month on month growth 180, Attention 580, leaving 40
+spare: at 616, with no room for a scrollbar, Power BI added a horizontal one, and the last row then
+needed a vertical one too. The table is 312 high, so all eight rows show.
 
 **Interactions.** The month slicer filters everything; the trend keeps all twelve months through
 `month_axis` (decision 4). The branch slicer filters everything except the table (decision 5).
@@ -413,6 +414,9 @@ A report theme, `dashboard/theme.json`, holds them, so they live in git and Mega
   to sit beside the site's panels, **one radius, 8**, on every visual (step 8, 8 Nov 2026): the
   callout tiles' own radius in the base theme, set in `theme.json` for every visual's container, the
   slicers' white panels and the callout tiles, so no visual carries its own corner or border setting.
+  Power BI draws a container's radius only while its border is on, so the theme turns the border on
+  in white, 1 px, on the white panels: rounded, with no visible line. The text boxes and the card
+  visuals (whose tiles carry their own corners) keep the border off.
 - **Titles in sentence case that say what the visual answers** ("Branches ranked by net revenue",
   "Revenue by month, 2025"). Measure names stay as in `metrics.json`; each visual renames its field for
   display ("Net revenue"), which changes no measure.
