@@ -395,6 +395,11 @@
             "metadata": "fct_orders.attention"
           }
         }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {}
+        }
       ]
     },
     "visualContainerObjects": {
