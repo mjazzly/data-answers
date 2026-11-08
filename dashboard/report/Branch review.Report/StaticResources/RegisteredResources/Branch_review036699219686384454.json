@@ -533,8 +533,14 @@
         ],
         "border": [
           {
-            "show": false,
-            "radius": 14
+            "show": true,
+            "width": 1,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "radius": 8
           }
         ],
         "dropShadow": [
@@ -551,6 +557,59 @@
                 "color": "#172529"
               }
             }
+          }
+        ]
+      }
+    },
+    "slicer": {
+      "*": {
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "width": 1,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "radius": 8
+          }
+        ]
+      }
+    },
+    "cardVisual": {
+      "*": {
+        "border": [
+          {
+            "show": false
+          }
+        ],
+        "shapeCustomRectangle": [
+          {
+            "$id": "default",
+            "tileShape": "rectangleRoundedByPixel",
+            "rectangleRoundedCurve": 8,
+            "rectangleRoundedCurveCustomStyle": false
+          }
+        ]
+      }
+    },
+    "textbox": {
+      "*": {
+        "border": [
+          {
+            "show": false
           }
         ]
       }
@@ -575,18 +634,6 @@
               }
             },
             "transparency": 0
-          }
-        ],
-        "pageSize": [
-          {
-            "pageSizeTypes": "Custom",
-            "pageSizeWidth": 1280,
-            "pageSizeHeight": 1100
-          }
-        ],
-        "displayArea": [
-          {
-            "verticalAlignment": "Middle"
           }
         ]
       }

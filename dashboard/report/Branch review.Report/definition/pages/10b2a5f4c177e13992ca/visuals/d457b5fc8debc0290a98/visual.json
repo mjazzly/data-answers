@@ -2,8 +2,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "d457b5fc8debc0290a98",
   "position": {
-    "x": 24,
-    "y": 596,
+    "x": 25.035448734713032,
+    "y": 605.38176919999444,
     "z": 6000,
     "height": 220,
     "width": 1232,
@@ -197,5 +197,51 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "6aa6b1c104818a52ab29",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "month_axis"
+              }
+            },
+            "Property": "month"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "16a6e223063da2a54221",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_orders"
+              }
+            },
+            "Property": "trend_selected_month"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "4eef20241026130eb4d2",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_orders"
+              }
+            },
+            "Property": "trend_revenue"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

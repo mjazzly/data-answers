@@ -95,23 +95,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "404d3fad791376875818",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fct_orders"
-              }
-            },
-            "Property": "branch"
-          }
-        },
-        "type": "Categorical"
-      }
-    ]
   }
 }
