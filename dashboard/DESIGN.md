@@ -390,8 +390,8 @@ A report theme, `dashboard/theme.json`, holds them, so they live in git and Mega
 - **Amounts on the cards in thousands, one decimal** (added 8 Nov 2026): the Revenue and Net revenue
   cards set the visual's display units to Thousands with 1 decimal place (147.6K). The measures keep
   `#,0.00`, so the check is unchanged. The branch table shows full values (27,517.80). The Average
-  order value card keeps full values, 250.98, because in thousands it would read 0.3K (recommended,
-  to confirm). Percent cards are unchanged.
+  order value card keeps full values, 250.98, because in thousands it would read 0.3K (confirmed by
+  Megat 8 Nov 2026). Percent cards are unchanged.
 - **Footer, one line** (added 8 Nov 2026): "Amounts are order values in one currency, shown without a
   symbol. All data is synthetic."
 - No dashes in report text; the subtitle joins with "·".
@@ -454,7 +454,9 @@ Given one instruction at a time when we get there. Every sign-in and setting is 
    saves, commits and pushes the project from the PC. On the Mac, Claude Code pulls, writes the eight
    measures with their Descriptions and formats into `fct_orders.tmdl`, runs the check and pushes.
    Megat pulls on the PC; Power BI reloads the changed project files, and Megat checks each measure on
-   a scratch card against its expected number. The helper measures follow the same way.
+   a scratch card against its expected number. The helper measures follow the same way. (Done:
+   `45f76bc` and `f9c695d`; all eight measures and all six helpers checked on the PC, the slicers
+   stood in for by page filters.)
 8. **Build the page** (section 2), then the phone layout. Save, commit, push; review.
 9. **Run the agreement query** in a DAX query view tab, copy the results with headers into Notepad,
    save as `dashboard\agreement.tsv`. Commit and push. On the Mac: pull and
