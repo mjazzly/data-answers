@@ -522,5 +522,11 @@ Given one instruction at a time when we get there. Every sign-in and setting is 
     then.)
 12. **Publish** to My workspace, create the Publish to web link and embed code, and open the link in a
     private window on the Mac to confirm it loads with no sign-in. Open it on a phone too (section 2).
+    (Published 9 Nov 2026 from the Free account, which Publish to web allowed. The public link, meant
+    to be public and not a secret:
+    `https://app.powerbi.com/view?r=eyJrIjoiYjFhM2Q3OGEtNzkwOS00ZjRlLWE0MDktY2RmMTNhNjUxODEyIiwidCI6ImY0ZjM0NzE0LWYzZTEtNGY1NC04ZTg0LTYxYWQyYWQ3ZWRkNCIsImMiOjEwfQ%3D%3D`.
+    Power BI's embed code is an iframe of that link, 600 by 373.5; Phase C sets its own size. It
+    exposes the whole semantic model, all synthetic. Republishing from Desktop to My workspace
+    updates it in place; deleting it under Settings, Manage embed codes stops it at once.)
 
 Then Phase C, in the site's own session, once the check is green.
