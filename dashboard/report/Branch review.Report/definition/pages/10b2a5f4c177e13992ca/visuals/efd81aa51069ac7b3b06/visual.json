@@ -173,22 +173,6 @@
           }
         }
       ],
-      "outline": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "fct_orders.revenue"
-          }
-        }
-      ],
       "divider": [
         {
           "properties": {
