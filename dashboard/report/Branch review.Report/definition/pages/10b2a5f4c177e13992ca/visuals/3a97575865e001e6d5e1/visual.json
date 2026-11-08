@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "3a97575865e001e6d5e1",
   "position": {
-    "x": 23.993480032599837,
-    "y": 279.57620211898939,
+    "x": 24,
+    "y": 280,
     "z": 5000,
-    "height": 301.48329258353709,
-    "width": 1232.0130399348002,
+    "height": 300,
+    "width": 1232,
     "tabOrder": 5000
   },
   "visual": {
@@ -321,6 +321,78 @@
               }
             ],
             "metadata": "fct_orders.returns_rate"
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "150D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "fct_orders.branch"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "130D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "fct_orders.net_revenue"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "120D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "fct_orders.returns_rate"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "180D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "fct_orders.mom_growth"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "616D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "fct_orders.attention"
           }
         }
       ]

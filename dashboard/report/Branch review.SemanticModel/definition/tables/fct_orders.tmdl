@@ -51,7 +51,8 @@ table fct_orders
 		formatString: 0.00%
 		lineageTag: e4bb1dc3-4736-40dc-a586-a3e7f0acb875
 
-	/// The month and branch under the page title, following the two slicers.
+	/// The month and branch under the page title, following the two slicers: the branch's name when one
+	/// is picked, the number of branches when several are, All branches when none is.
 	measure page_subtitle =
 			VAR month_name =
 			    IF (
@@ -59,8 +60,16 @@ table fct_orders
 			        FORMAT ( MIN ( fct_orders[order_date] ), "mmmm yyyy", "en-GB" ),
 			        "All months"
 			    )
+			VAR branches = COUNTROWS ( VALUES ( fct_orders[branch] ) )
+			VAR branch_name =
+			    SWITCH (
+			        TRUE (),
+			        NOT ISFILTERED ( fct_orders[branch] ), "All branches",
+			        branches = 1, VALUES ( fct_orders[branch] ),
+			        branches & " branches"
+			    )
 			RETURN
-			    month_name & " · " & SELECTEDVALUE ( fct_orders[branch], "All branches" )
+			    month_name & " · " & branch_name
 		lineageTag: 9476b5bd-e139-46e8-90a9-96aa6396ce66
 
 	/// The words in the branch table's Attention column: which part of the flag rule a branch meets in the
@@ -105,14 +114,14 @@ table fct_orders
 		lineageTag: 69104476-c6bb-4957-b8d9-27b8770db70a
 
 	/// The shared x axis maximum of the two detail charts: the larger of the top category's and the top
-	/// channel's revenue in the current selection.
+	/// channel's revenue in the current selection, plus 15% so the longest bar's label fits.
 	measure detail_scale_max =
 			VAR top_category =
 			    CALCULATE ( MAXX ( VALUES ( fct_orders[category] ), [revenue] ), REMOVEFILTERS ( fct_orders[category] ) )
 			VAR top_channel =
 			    CALCULATE ( MAXX ( VALUES ( fct_orders[channel] ), [revenue] ), REMOVEFILTERS ( fct_orders[channel] ) )
 			RETURN
-			    MAX ( top_category, top_channel )
+			    MAX ( top_category, top_channel ) * 1.15
 		formatString: #,0.00
 		lineageTag: 0b03405c-38cf-47eb-bc91-7464aff38a82
 
