@@ -576,6 +576,18 @@
             },
             "transparency": 0
           }
+        ],
+        "pageSize": [
+          {
+            "pageSizeTypes": "Custom",
+            "pageSizeWidth": 1280,
+            "pageSizeHeight": 1100
+          }
+        ],
+        "displayArea": [
+          {
+            "verticalAlignment": "Middle"
+          }
         ]
       }
     }
