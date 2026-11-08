@@ -11,7 +11,8 @@
     "eval": "node eval/run_eval.js",
     "raw": "node scripts/make_raw.js",
     "models": "cd transform && dbt build",
-    "export": "node scripts/export_mart.js"
+    "export": "node scripts/export_mart.js",
+    "dashboard:data": "node scripts/export_dashboard.js"
   },
   "author": "Megat Jazly",
   "license": "UNLICENSED",
