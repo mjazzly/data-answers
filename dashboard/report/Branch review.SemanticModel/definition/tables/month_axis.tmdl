@@ -1,0 +1,24 @@
+table month_axis
+	lineageTag: 14c14531-b301-4213-a0ab-cbb71b5ebd9e
+
+	column month
+		dataType: string
+		lineageTag: d9a609a9-bc4f-458f-be5c-6eda1d691bc8
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	partition month_axis = m
+		mode: import
+		source =
+				let
+				    Source = fct_orders,
+				    Months = Table.Distinct(Table.SelectColumns(Source, {"month"}))
+				in
+				    Months
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

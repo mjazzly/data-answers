@@ -1,0 +1,105 @@
+table fct_orders
+	lineageTag: 09b50f6c-555d-4cae-8e2e-f5ab36ea5327
+
+	column order_id
+		dataType: string
+		lineageTag: 440bfed4-7627-4d46-bee8-f6f8b0239473
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column branch
+		dataType: string
+		lineageTag: 3ee9d443-396c-4ac7-9ef9-d14bb5918c9b
+		summarizeBy: none
+		sourceColumn: branch
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b69fa39d-0998-4d3f-9593-74be5987ed82
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column month
+		dataType: string
+		lineageTag: 64094199-c8d7-4892-8408-0442d77695a8
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: string
+		lineageTag: 60b12d02-579b-40eb-8d52-211b6972ab60
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 3f2a0279-c3cd-4cfd-bbf5-12fcc283fd34
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel
+		dataType: string
+		lineageTag: 70d83a58-f376-4846-ad04-ad51aa6b8ee6
+		summarizeBy: none
+		sourceColumn: channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_value
+		dataType: decimal
+		formatString: #,0.00
+		lineageTag: c1910a21-266f-45ff-80e5-abc53c5e7f41
+		summarizeBy: sum
+		sourceColumn: order_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	column returned
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2d57e131-3b5d-463b-9f8b-1cf65e9e8fe7
+		summarizeBy: none
+		sourceColumn: returned
+
+		annotation SummarizationSetBy = Automatic
+
+	column export_batch
+		dataType: int64
+		formatString: 0
+		lineageTag: 3c3e8449-12c9-41a0-8e9a-08b9d19528aa
+		summarizeBy: sum
+		sourceColumn: export_batch
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fct_orders = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(RepoPath & "\dashboard\data\fct_orders.parquet")),
+				    BatchOne = Table.SelectRows(Source, each [export_batch] = 1),
+				    Typed = Table.TransformColumnTypes(BatchOne, {{"order_value", Currency.Type}})
+				in
+				    Typed
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
