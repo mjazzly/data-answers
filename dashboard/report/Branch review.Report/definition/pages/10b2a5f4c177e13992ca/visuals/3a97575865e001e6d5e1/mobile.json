@@ -7,5 +7,15 @@
     "height": 320,
     "width": 324,
     "tabOrder": 5000
+  },
+  "objects": {
+    "total": [],
+    "values": [],
+    "columnWidth": [],
+    "columnHeaders": [
+      {
+        "properties": {}
+      }
+    ]
   }
 }
