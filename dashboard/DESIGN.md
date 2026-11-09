@@ -422,6 +422,9 @@ A report theme, `dashboard/theme.json`, holds them, so they live in git and Mega
 - **Segoe UI** throughout (Manrope does not render in the Power BI service), named in `theme.json`
   with Power BI's web fallbacks (`wf_segoe-ui_semibold, helvetica, arial, sans-serif`): named alone,
   the titles fell back to a serif font on a Mac, where Segoe UI is not installed (seen 9 Nov 2026).
+  The service keeps only the first name for a visual title, so the visual titles name Power BI's
+  own web font, `wf_segoe-ui_semibold`, first: it is loaded on every public page, so the titles show
+  in Segoe UI Semibold on any device.
 - No gradients, no 3D, no pie or donut charts, no shadows, no visual borders; rounded visual corners
   to sit beside the site's panels, **one radius, 8**, on every visual (step 8, 8 Nov 2026): the
   callout tiles' own radius in the base theme, set in `theme.json` for every visual's container, the
