@@ -18,6 +18,7 @@
     "callout": { "fontFace": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif", "fontSize": 24, "color": "#172529" },
     "title": { "fontFace": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif", "fontSize": 12, "color": "#172529" },
     "header": { "fontFace": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif", "fontSize": 12, "color": "#172529" },
+    "largeTitle": { "fontFace": "Arial", "fontSize": 12, "color": "#172529" },
     "label": { "fontFace": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif", "fontSize": 10, "color": "#4F6166" }
   },
   "visualStyles": {

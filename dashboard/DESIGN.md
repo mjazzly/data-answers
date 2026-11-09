@@ -425,7 +425,9 @@ A report theme, `dashboard/theme.json`, holds them, so they live in git and Mega
   The one exception is the four visual titles, in **Arial, bold, 12** (Megat's choice, 9 Nov 2026):
   the service writes its own bare name for a Segoe UI title font, dropping every fallback (and a
   web font named first, tried and seen not to work), so on a Mac or phone those titles fell to a
-  serif. Arial is on every device and passes through unchanged.
+  serif. Arial is on every device and passes through unchanged. Visual titles take their font from
+  the theme's `largeTitle` text class (built on `title`), not from `visualStyles` title, so Arial is
+  set there; the published page showed no change until it was.
 - No gradients, no 3D, no pie or donut charts, no shadows, no visual borders; rounded visual corners
   to sit beside the site's panels, **one radius, 8**, on every visual (step 8, 8 Nov 2026): the
   callout tiles' own radius in the base theme, set in `theme.json` for every visual's container, the
