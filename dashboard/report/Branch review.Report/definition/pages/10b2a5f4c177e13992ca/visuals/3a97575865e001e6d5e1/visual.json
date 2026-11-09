@@ -438,5 +438,79 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "230e9a04643c6a2bddab",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_orders"
+              }
+            },
+            "Property": "branch"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "9c285b90ca637159202e",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_orders"
+              }
+            },
+            "Property": "net_revenue"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f157ca9a10757b005dd7",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_orders"
+              }
+            },
+            "Property": "returns_rate"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "120cdc36b416d1c3b355",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_orders"
+              }
+            },
+            "Property": "mom_growth"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "7babfd85dd01387401c0",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_orders"
+              }
+            },
+            "Property": "attention"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

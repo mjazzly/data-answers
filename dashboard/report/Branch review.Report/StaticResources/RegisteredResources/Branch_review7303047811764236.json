@@ -550,7 +550,7 @@
         ],
         "title": [
           {
-            "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif",
+            "fontFamily": "wf_segoe-ui_semibold, 'Segoe UI Semibold', helvetica, arial, sans-serif",
             "fontSize": 12,
             "fontColor": {
               "solid": {
