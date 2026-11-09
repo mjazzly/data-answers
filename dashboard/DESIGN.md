@@ -539,6 +539,11 @@ Given one instruction at a time when we get there. Every sign-in and setting is 
     updates it in place; deleting it under Settings, Manage embed codes stops it at once. Checked 9 Nov
     2026: loads with no sign-in in a private window on the Mac, the slicers work, and no Filters pane
     shows. On a phone browser it shows the desktop page shrunk, not the phone layout, so the site's
-    plan for phones (a still picture plus the link) stands.)
+    plan for phones (a still picture plus the link) stands. The public view is cached apart from
+    the report: on 9 Nov 2026 the report in My workspace had every later republish (one report, one
+    semantic model, modified minutes before), while the link still served the first publish's theme
+    and definition. It catches up on its own; recreating the embed code would force it but changes
+    the URL, so it is left to refresh. To confirm later: the visual titles in Arial (sans-serif on a
+    Mac) and no outline on any callout tile.)
 
 Then Phase C, in the site's own session, once the check is green.
