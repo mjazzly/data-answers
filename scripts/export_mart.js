@@ -8,13 +8,15 @@
 //
 // Refuses unless transform/target/run_results.json shows a whole dbt build in which every seed, model
 // and test passed: the post-hook runs before fct_orders' own tests, so a Parquet file on disk proves
-// nothing by itself. The Parquet file is read by this DuckDB; the warehouse file never is.
+// nothing by itself. The rule lives in scripts/build_gate.js, shared with scripts/export_dashboard.js.
+// The Parquet file is read by this DuckDB; the warehouse file never is.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { amount } from "../lib/round.js";
 import { csvText } from "./csv.js";
+import { whyNotPassed } from "./build_gate.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.dirname(here);
@@ -23,15 +25,9 @@ const OUT = path.join(TARGET, "export");
 const refuse = (why) => { console.error(`export_mart: ${why}; nothing exported`); process.exit(1); };
 
 fs.rmSync(OUT, { recursive: true, force: true });
-const resultsPath = path.join(TARGET, "run_results.json");
-if (!fs.existsSync(resultsPath)) refuse("no transform/target/run_results.json, so no dbt build has run");
-const run = JSON.parse(fs.readFileSync(resultsPath, "utf8"));
-if (run.args?.which !== "build" || run.args?.select?.length) refuse(`the last dbt run was not a whole build (${run.args?.which} ${run.args?.select?.join(" ") || ""})`);
-const bad = run.results.filter((r) => !["success", "pass"].includes(r.status));
-if (bad.length) refuse(`${bad.length} of ${run.results.length} nodes did not pass: ${bad.map((r) => `${r.unique_id} ${r.status}`).join(", ")}`);
-if (!run.results.some((r) => r.unique_id === "model.data_answers.fct_orders")) refuse("the last build did not build fct_orders");
+const why = whyNotPassed(TARGET);
+if (why) refuse(why);
 const parquet = path.join(TARGET, "fct_orders.parquet");
-if (!fs.existsSync(parquet)) refuse("no transform/target/fct_orders.parquet");
 
 const db = await DuckDBInstance.create(":memory:");
 const con = await db.connect();

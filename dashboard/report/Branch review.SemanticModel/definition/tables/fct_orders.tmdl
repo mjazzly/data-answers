@@ -1,0 +1,229 @@
+table fct_orders
+	lineageTag: 09b50f6c-555d-4cae-8e2e-f5ab36ea5327
+
+	/// Count of orders placed in the period, returned or not.
+	measure orders = COUNTROWS ( fct_orders )
+		formatString: #,0
+		lineageTag: c8f49fb2-1115-43bb-8aa7-f3ed6fad4ef6
+
+	/// Count of orders placed in the period that were later returned.
+	measure returns = CALCULATE ( COUNTROWS ( fct_orders ), KEEPFILTERS ( fct_orders[returned] = TRUE () ) )
+		formatString: #,0
+		lineageTag: ced9d8bc-879c-4a5e-ac77-d30b5db6a9a2
+
+	/// Sum of the order value of every order placed in the period, before returns.
+	measure revenue = SUM ( fct_orders[order_value] )
+		formatString: #,0.00
+		lineageTag: d6177a3b-434d-4625-989b-21359a03a034
+
+	/// Sum of the order value of the orders placed in the period that were later returned.
+	measure returned_value = CALCULATE ( [revenue], KEEPFILTERS ( fct_orders[returned] = TRUE () ) )
+		formatString: #,0.00
+		lineageTag: 90b1f458-1f29-49a1-8a9d-a65ff8769573
+
+	/// Revenue minus returned value: the order value of the orders placed in the period that were not returned.
+	measure net_revenue = [revenue] - [returned_value]
+		formatString: #,0.00
+		lineageTag: f8c10e27-3d75-4eef-bebd-16f9b4dd6b61
+
+	/// Returns divided by orders, as a percent: the share of orders placed in the period that were later returned.
+	measure returns_rate = DIVIDE ( COALESCE ( [returns], 0 ), [orders] )
+		formatString: 0.00%
+		lineageTag: 35703d0e-7277-4627-a6f9-1b3a6601f4f4
+
+	/// Revenue divided by orders: the mean order value of the orders placed in the period.
+	measure average_order_value = DIVIDE ( [revenue], [orders] )
+		formatString: #,0.00
+		lineageTag: 2295caf9-62d4-4f6a-ac9d-8f21a0045373
+
+	/// Revenue in the month minus revenue in the month before, divided by the month before, as a percent. The period must be one month, and January has no month before it in the data.
+	measure mom_growth =
+			VAR this_month = SELECTEDVALUE ( fct_orders[month] )
+			VAR month_before = FORMAT ( EOMONTH ( MIN ( fct_orders[order_date] ), -1 ), "yyyy-MM" )
+			VAR revenue_before =
+			    CALCULATE (
+			        [revenue],
+			        REMOVEFILTERS ( fct_orders[month], fct_orders[quarter], fct_orders[order_date] ),
+			        fct_orders[month] = month_before
+			    )
+			RETURN
+			    IF ( NOT ISBLANK ( this_month ), DIVIDE ( [revenue] - revenue_before, revenue_before ) )
+		formatString: 0.00%
+		lineageTag: e4bb1dc3-4736-40dc-a586-a3e7f0acb875
+
+	/// The month and branch under the page title, following the two slicers: the branch's name when one
+	/// is picked, the number of branches when several are, All branches when none is.
+	measure page_subtitle =
+			VAR month_name =
+			    IF (
+			        HASONEVALUE ( fct_orders[month] ),
+			        FORMAT ( MIN ( fct_orders[order_date] ), "mmmm yyyy", "en-GB" ),
+			        "All months"
+			    )
+			VAR branches = COUNTROWS ( VALUES ( fct_orders[branch] ) )
+			VAR branch_name =
+			    SWITCH (
+			        TRUE (),
+			        NOT ISFILTERED ( fct_orders[branch] ), "All branches",
+			        branches = 1, VALUES ( fct_orders[branch] ),
+			        branches & " branches"
+			    )
+			RETURN
+			    month_name & " · " & branch_name
+		lineageTag: 9476b5bd-e139-46e8-90a9-96aa6396ce66
+
+	/// The words in the branch table's Attention column: which part of the flag rule a branch meets in the
+	/// month under review. Blank when it meets neither, and on the total row.
+	measure attention =
+			VAR returns_high =
+			    [returns_rate] > CALCULATE ( [returns_rate], REMOVEFILTERS ( fct_orders[branch] ) )
+			VAR revenue_down = NOT ISBLANK ( [mom_growth] ) && [mom_growth] < 0
+			RETURN
+			    IF (
+			        HASONEVALUE ( fct_orders[branch] ),
+			        SWITCH (
+			            TRUE (),
+			            returns_high && revenue_down, "● Returns above all branches; revenue down on the month before",
+			            returns_high, "● Returns above all branches",
+			            revenue_down, "● Revenue down on the month before"
+			        )
+			    )
+		lineageTag: bd941c15-6030-48a7-941a-3be5fa48f490
+
+	/// The amber tint behind a flagged row of the branch table (background colour, by field value).
+	measure attention_colour = IF ( NOT ISBLANK ( [attention] ), "#F7EFDD" )
+		lineageTag: 74a08038-746f-4289-9a9d-a7411edc3bec
+
+	/// The trend's line: revenue for each month of month_axis, ignoring the month slicer so all twelve
+	/// months stay on the line. The branch slicer still applies.
+	measure trend_revenue =
+			CALCULATE (
+			    [revenue],
+			    REMOVEFILTERS ( fct_orders[month], fct_orders[quarter], fct_orders[order_date] ),
+			    TREATAS ( VALUES ( month_axis[month] ), fct_orders[month] )
+			)
+		formatString: #,0.00
+		lineageTag: 0bd90de0-236b-4ac6-9550-4eb408b21098
+
+	/// The trend's pale column: the selected month's revenue at that month only, blank at the others.
+	measure trend_selected_month =
+			VAR picked = SELECTEDVALUE ( fct_orders[month] )
+			RETURN
+			    IF ( NOT ISBLANK ( picked ) && SELECTEDVALUE ( month_axis[month] ) = picked, [trend_revenue] )
+		formatString: #,0.00
+		lineageTag: 69104476-c6bb-4957-b8d9-27b8770db70a
+
+	/// The shared x axis maximum of the two detail charts: the larger of the top category's and the top
+	/// channel's revenue in the current selection, plus 15% so the longest bar's label fits.
+	measure detail_scale_max =
+			VAR top_category =
+			    CALCULATE ( MAXX ( VALUES ( fct_orders[category] ), [revenue] ), REMOVEFILTERS ( fct_orders[category] ) )
+			VAR top_channel =
+			    CALCULATE ( MAXX ( VALUES ( fct_orders[channel] ), [revenue] ), REMOVEFILTERS ( fct_orders[channel] ) )
+			RETURN
+			    MAX ( top_category, top_channel ) * 1.15
+		formatString: #,0.00
+		lineageTag: 0b03405c-38cf-47eb-bc91-7464aff38a82
+
+	column order_id
+		dataType: string
+		lineageTag: 440bfed4-7627-4d46-bee8-f6f8b0239473
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column branch
+		dataType: string
+		lineageTag: 3ee9d443-396c-4ac7-9ef9-d14bb5918c9b
+		summarizeBy: none
+		sourceColumn: branch
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b69fa39d-0998-4d3f-9593-74be5987ed82
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column month
+		dataType: string
+		lineageTag: 64094199-c8d7-4892-8408-0442d77695a8
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: string
+		lineageTag: 60b12d02-579b-40eb-8d52-211b6972ab60
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 3f2a0279-c3cd-4cfd-bbf5-12fcc283fd34
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel
+		dataType: string
+		lineageTag: 70d83a58-f376-4846-ad04-ad51aa6b8ee6
+		summarizeBy: none
+		sourceColumn: channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_value
+		dataType: decimal
+		formatString: #,0.00
+		lineageTag: c1910a21-266f-45ff-80e5-abc53c5e7f41
+		summarizeBy: sum
+		sourceColumn: order_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	column returned
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2d57e131-3b5d-463b-9f8b-1cf65e9e8fe7
+		summarizeBy: none
+		sourceColumn: returned
+
+		annotation SummarizationSetBy = Automatic
+
+	column export_batch
+		dataType: int64
+		formatString: 0
+		lineageTag: 3c3e8449-12c9-41a0-8e9a-08b9d19528aa
+		summarizeBy: sum
+		sourceColumn: export_batch
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fct_orders = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(RepoPath & "\dashboard\data\fct_orders.parquet")),
+				    BatchOne = Table.SelectRows(Source, each [export_batch] = 1),
+				    Typed = Table.TransformColumnTypes(BatchOne, {{"order_value", Currency.Type}})
+				in
+				    Typed
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

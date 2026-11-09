@@ -1,0 +1,93 @@
+{
+  "run_id": "D202611082324-ebdafcd",
+  "written": "2026-11-08T23:24:38.138Z",
+  "commit": "ebdafcd",
+  "dirty": false,
+  "data_state": "export_batch 1 only (4,948 rows), the state the counted cases assume",
+  "source": "dashboard/agreement.tsv, the result of dashboard/agreement.dax pasted from DAX query view",
+  "model": {
+    "semantic_model": "dashboard/report/Branch review.SemanticModel",
+    "metric_measures": [
+      "orders",
+      "returns",
+      "revenue",
+      "returned_value",
+      "net_revenue",
+      "returns_rate",
+      "average_order_value",
+      "mom_growth"
+    ],
+    "helper_measures": [
+      "page_subtitle",
+      "attention",
+      "attention_colour",
+      "trend_revenue",
+      "trend_selected_month",
+      "detail_scale_max"
+    ],
+    "relationships": 0,
+    "passed": true
+  },
+  "matched": 14,
+  "total": 14,
+  "values_compared": 44,
+  "misses": [],
+  "left_out": [
+    {
+      "case": "A08",
+      "reason": "revenue_share is not a measure on this page"
+    },
+    {
+      "case": "A13",
+      "reason": "largest_order is not a measure on this page"
+    },
+    {
+      "case": "A15",
+      "reason": "qoq_growth is not a measure on this page"
+    },
+    {
+      "case": "A16",
+      "reason": "orders_share is not a measure on this page"
+    },
+    {
+      "case": "A17",
+      "reason": "compare_periods: a comparison the assistant builds, with change columns the page has no measure for"
+    },
+    {
+      "case": "A18",
+      "reason": "compare_periods: a comparison the assistant builds, with change columns the page has no measure for"
+    },
+    {
+      "case": "R01",
+      "reason": "a gate: the right answer is a refusal, with no number"
+    },
+    {
+      "case": "R02",
+      "reason": "a gate first; the number after it repeats a kind of question already counted"
+    },
+    {
+      "case": "R03",
+      "reason": "a gate: the right answer is a refusal, with no number"
+    },
+    {
+      "case": "R04",
+      "reason": "a gate: the right answer is a refusal, with no number"
+    },
+    {
+      "case": "R05",
+      "reason": "a gate first; the number after it repeats a kind of question already counted"
+    },
+    {
+      "case": "R06",
+      "reason": "a gate: the right answer is a refusal, with no number"
+    },
+    {
+      "case": "S01",
+      "reason": "the same question as A02"
+    },
+    {
+      "case": "S02",
+      "reason": "assumes batch 2 is loaded; the dashboard shows export_batch 1 only"
+    }
+  ]
+}

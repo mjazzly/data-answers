@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Branch review"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "2213c59a-5712-4f24-808c-7b33d8b3e1ed"
+  }
+}

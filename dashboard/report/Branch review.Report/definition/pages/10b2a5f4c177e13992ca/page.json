@@ -1,0 +1,15 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "10b2a5f4c177e13992ca",
+  "displayName": "Branch review",
+  "displayOption": "FitToPage",
+  "height": 1100,
+  "width": 1280,
+  "visualInteractions": [
+    {
+      "source": "59acf20e04aec49a9d74",
+      "target": "3a97575865e001e6d5e1",
+      "type": "NoFilter"
+    }
+  ]
+}

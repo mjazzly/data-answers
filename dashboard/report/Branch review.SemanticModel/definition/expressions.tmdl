@@ -1,0 +1,7 @@
+expression RepoPath = "C:\repos\data-answers" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 80cee955-4191-4d90-a735-d242502815d9
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

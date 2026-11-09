@@ -35,3 +35,11 @@ transform/*.duckdb
 
 # the Project D brief stays local
 PROJECT-D-BRIEF.md
+
+# the dashboard brief stays local
+DASHBOARD-BRIEF.md
+
+# Power BI Desktop's local cache and settings inside the report project (the project writes its own
+# ignore file too; this holds even if that one is missing)
+dashboard/report/**/.pbi/cache.abf
+dashboard/report/**/.pbi/localSettings.json

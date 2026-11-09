@@ -1,0 +1,34 @@
+// The agreement check (dashboard/DESIGN.md, section 5): the dashboard's own measures on the 14 case
+// questions it can answer. One row per number. Values are not rounded here: scripts/check_dashboard.js
+// rounds them by the assistant's rule. The table holds 2025 only, so the year needs no filter.
+EVALUATE
+UNION (
+    ROW ( "case_id", "A01", "group", "", "value", [orders] ),
+    ROW ( "case_id", "A02", "group", "", "value", CALCULATE ( [revenue], fct_orders[month] = "2025-03" ) ),
+    SELECTCOLUMNS (
+        SUMMARIZECOLUMNS ( fct_orders[branch], TREATAS ( { "2025-Q2" }, fct_orders[quarter] ), "v", [orders] ),
+        "case_id", "A03", "group", fct_orders[branch], "value", [v] ),
+    SELECTCOLUMNS (
+        SUMMARIZECOLUMNS ( fct_orders[branch], TREATAS ( { "2025-Q3" }, fct_orders[quarter] ), "v", [returns_rate] ),
+        "case_id", "A04", "group", fct_orders[branch], "value", [v] ),
+    ROW ( "case_id", "A05", "group", "", "value", CALCULATE ( [average_order_value], fct_orders[month] = "2025-03" ) ),
+    SELECTCOLUMNS (
+        SUMMARIZECOLUMNS ( fct_orders[category], "v", [revenue] ),
+        "case_id", "A06", "group", fct_orders[category], "value", [v] ),
+    ROW ( "case_id", "A07", "group", "", "value", CALCULATE ( [returns_rate], fct_orders[channel] = "Online" ) ),
+    ROW ( "case_id", "A09", "group", "", "value", CALCULATE ( [mom_growth], fct_orders[month] = "2025-06" ) ),
+    SELECTCOLUMNS (
+        SUMMARIZECOLUMNS ( fct_orders[month], TREATAS ( { "Riverside" }, fct_orders[branch] ), "v", [revenue] ),
+        "case_id", "A10", "group", fct_orders[month], "value", [v] ),
+    ROW ( "case_id", "A11", "group", "", "value", CALCULATE ( [net_revenue], fct_orders[quarter] = "2025-Q4" ) ),
+    ROW ( "case_id", "A12", "group", "", "value",
+        CALCULATE ( [returned_value], fct_orders[category] = "Kitchen", fct_orders[quarter] = "2025-Q1" ) ),
+    SELECTCOLUMNS (
+        SUMMARIZECOLUMNS ( fct_orders[channel], TREATAS ( { "2025-08" }, fct_orders[month] ), "v", [orders] ),
+        "case_id", "A14", "group", fct_orders[channel], "value", [v] ),
+    ROW ( "case_id", "A19", "group", "", "value",
+        CALCULATE ( [revenue], fct_orders[branch] = "Harbour", fct_orders[month] = "2025-05" ) ),
+    ROW ( "case_id", "A20", "group", "", "value",
+        CALCULATE ( [returns_rate], fct_orders[branch] = "Riverside", fct_orders[quarter] = "2025-Q2" ) )
+)
+ORDER BY [case_id], [group]
